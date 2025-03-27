@@ -1,9 +1,11 @@
-import React from "react";
+import { Board } from "@/widgets/Board";
 
 const App = () => {
   return (
     <>
-      <div>Hello. I am your App!</div>
+      <div>
+        <Board />
+      </div>
     </>
   );
 };

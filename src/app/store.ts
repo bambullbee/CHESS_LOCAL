@@ -1,8 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
+import boardReducer from "./slices/boardSlice";
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    board: boardReducer,
+  },
 });
 
 export type AppStore = typeof store;

@@ -15,57 +15,25 @@ export function buildLoaders(options: BuildOptions): ModuleOptions["rules"] {
     type: "asset/resource",
   };
 
-  const cssLoaderWithModules = {
-    loader: "css-loader",
-    options: {
-      modules: {
-        localIdentName: isDev ? "[path][name]__[local]" : "[hash:base-64:8]",
-      },
-    },
-  };
-
-  // const cssLoader = {
-  //   test: /\.css$/i,
-  //   use: [
-  //     isDev ? "style-loader" : MiniCssExtractPlugin.loader,
-  //     cssLoaderWithModules,
-  //   ],
-  // }; cssLoaderWithModules DONT WORK WITH POSTCSSLOADER
-
   const cssLoader = {
     test: /\.css$/i,
     use: [
       isDev ? "style-loader" : MiniCssExtractPlugin.loader,
-      "css-loader",
+      {
+        loader: "css-loader",
+        options: {
+          modules: {
+            localIdentName: isDev
+              ? "[path][name]__[local]"
+              : "[hash:base-64:8]",
+          },
+        },
+      },
       "postcss-loader",
     ],
   };
 
-  // const tsLoader = {
-  //   exclude: /node_modules/,
-  //   test: /\.tsx?$/,
-  //   use: [
-  //     {
-  //       loader: "ts-loader",
-  //       options: {
-  //         transpileOnly: true,
-
-  //         getCustomTransformers: () => ({
-  //           before: [isDev && ReactRefreshTypeScript()].filter(Boolean),
-  //         }),
-  //       },
-  //     },
-  //   ],
-  // };
-
   const babelLoader = buildBabelLoader(options);
 
-  //позволяет использовать свг как реакт компоненты
-  const svgrLoader = {
-    test: /\.svg$/i,
-    issuer: /\.[jt]sx?$/,
-    use: [{ loader: "@svgr/webpack", options: { icon: true } }],
-  };
-
-  return [assetLoader, cssLoader, babelLoader, svgrLoader];
+  return [assetLoader, cssLoader, babelLoader];
 }
