@@ -1,5 +1,5 @@
 import Cell from "./Cell";
-import type { CellP, Figure } from "./Cell";
+import type { CellP } from "./Cell";
 
 export { Cell };
-export type { CellP, Figure };
+export type { CellP };

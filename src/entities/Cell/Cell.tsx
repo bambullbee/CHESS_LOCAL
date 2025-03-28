@@ -1,20 +1,19 @@
 import { useMemo, useState } from "react";
 
 import s from "./Cell.module.css";
-import getStartFigure from "./helpers/getStartFigure";
-import { cellHandler } from "@/widgets/Board/Board";
+import useSelectorTs from "@/shared/withTypesHooks/useSelector";
+import { useDispatchTs } from "@/shared";
+import { changeAttackedState, changeChosenCell } from "@/app";
 
 interface CellP {
   row: number;
   column: number;
-  onClick: cellHandler;
+  id: number;
 }
 
-type Figure = "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
-
-const Cell = ({ row, column, onClick }: CellP) => {
+const Cell = ({ row, column, id }: CellP) => {
   //заменить хардкод цветов на получение цветов из стора-тема
-  const color = useMemo(() => {
+  const squareColor = useMemo(() => {
     if (row % 2 === 0) {
       if (column % 2 === 0) {
         return "black";
@@ -28,44 +27,36 @@ const Cell = ({ row, column, onClick }: CellP) => {
     }
   }, []);
 
-  const [figure, setFigure] = useState<Figure>(getStartFigure(row, column));
+  const { figure, color, isAttacked, attacks } = useSelectorTs(
+    (state) => state.board.cells[id]
+  );
+  const chosenCell = useSelectorTs((state) => state.board.chosenCell);
+
+  const dispatch = useDispatchTs();
+
+  const onClick = () => {
+    if (chosenCell === null) {
+      dispatch(changeChosenCell(id));
+    }
+    attacks.forEach((id) => {
+      dispatch(changeAttackedState(id));
+    });
+  };
 
   return (
     <button
       className={s.cell}
-      style={{ backgroundColor: color }}
-      onClick={(e) => {
-        onClick;
+      style={{
+        backgroundColor: isAttacked ? "blue" : squareColor,
+        color: color === "white" ? "pink" : "brown",
       }}
+      onClick={onClick}
     >
-      {figure === "pawn" ? (
-        <svg
-          height="100%"
-          viewBox="0 0 2 3"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-        >
-          <ellipse cx="1" cy="2.8" rx="0.4" ry="0.15" fill="#333" />
-          <path d="M0.8 2.8 Q1 1.5 1.2 2.8 Z" fill="#555" />
-          <ellipse cx="1" cy="1.5" rx="0.25" ry="0.15" fill="#666" />
-          <ellipse
-            cx="1"
-            cy="1.7"
-            rx="0.2"
-            ry="0.05"
-            fill="none"
-            stroke="#aaa"
-            stroke-width="0.02"
-          />
-          <circle cx="1" cy="1.4" r="0.08" fill="#777" />
-        </svg>
-      ) : (
-        figure
-      )}
+      {figure}, r{row}, c{column}
     </button>
   );
 };
 
 export default Cell;
 
-export type { CellP, Figure };
+export type { CellP };

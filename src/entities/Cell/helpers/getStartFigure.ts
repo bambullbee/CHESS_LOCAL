@@ -1,6 +1,6 @@
-import { Figure } from "../Cell";
+import { type FigureType } from "@/shared";
 
-const getStartFigure = (row: number, column: number): Figure => {
+const getStartFigure = (row: number, column: number): FigureType => {
   if (row === 2 || row === 7) {
     return "pawn";
   }

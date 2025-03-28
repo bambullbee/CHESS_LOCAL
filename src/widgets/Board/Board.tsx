@@ -1,61 +1,73 @@
-import React, { Dispatch, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import s from "./Board.module.css";
-
 import { Cell } from "@/entities/Cell";
-import { Figure } from "@/entities/Cell";
+import { FigureType } from "@/shared";
 import useSelectorTs from "@/shared/withTypesHooks/useSelector";
 
-type cellHandler = (
-  row: number,
-  col: number,
-  setFigure: Dispatch<Figure>
-) => () => void;
+type cellHandler = (row: number, col: number, id: number) => void;
 
 interface chosenCell {
   row: number;
   col: number;
-  figure: Figure;
+  id: number;
+  figure: FigureType;
 }
 
 const Board = () => {
-  const getCellInfo = (row: number, col: number): chosenCell => {
+  const getCellInfo = (row: number, col: number, id: number): chosenCell => {
     return {
       row,
       col,
+      id,
       figure: useSelectorTs(
         (state) => state.board.cells[state.board.rows[row][col]].figure
       ),
     };
   };
 
-  const handleClick: cellHandler = (row, col, setFigure) => {
-    let firstCell: chosenCell = null;
-    let secondCell: chosenCell = null;
-    return () => {
-      if (firstCell) {
-        if (
-          secondCell.row === firstCell.row &&
-          secondCell.col === firstCell.col
-        ) {
-          //логика по снятию фокуса с обеих фигур
-        } else {
-        }
+  const [firstChosenCell, setFirstChosenCell] = useState<chosenCell>(null);
+  const [secondChosenCell, setSecondChosenCell] = useState<chosenCell>(null);
+
+  const onClick: cellHandler = (row, col, id) => {
+    if (firstChosenCell) {
+      setSecondChosenCell(getCellInfo(row, col, id));
+      if (
+        secondChosenCell.row === firstChosenCell.row &&
+        secondChosenCell.col === firstChosenCell.col
+      ) {
+        setFirstChosenCell(null), setSecondChosenCell(null);
+        return;
       } else {
-        firstCell = getCellInfo(row, col);
       }
-    };
+    } else {
+      setFirstChosenCell(getCellInfo(row, col, id));
+    }
   };
 
   const CELLS = useMemo(() => {
     return Array.from({ length: 8 }, (_, ind) => {
       return Array.from({ length: 8 }, (_, i) => {
-        return <Cell row={ind + 1} column={i + 1} onClick={handleClick} />;
-      });
-    }).reverse();
+        return <Cell row={ind + 1} column={i + 1} id={ind * 8 + i + 1} />;
+      }).reverse();
+    });
   }, []);
 
-  return <div className={s.board}>{CELLS}</div>;
+  return (
+    <div
+      className={s.board}
+      onClick={(e) => {
+        const dataset = (e.target as HTMLElement).dataset;
+        onClick(
+          parseInt(dataset.row),
+          parseInt(dataset.column),
+          parseInt(dataset.id)
+        );
+      }}
+    >
+      {CELLS}
+    </div>
+  );
 };
 
 export default Board;

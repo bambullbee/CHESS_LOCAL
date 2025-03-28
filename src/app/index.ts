@@ -1,6 +1,7 @@
 import App from "./App";
+import { changeChosenCell, changeAttackedState } from "./slices/boardSlice";
 import { store } from "./store";
+
 import type { RootState } from "./store";
 
-export { store, App };
-export { RootState };
+export { App, store, changeChosenCell, changeAttackedState, type RootState };
