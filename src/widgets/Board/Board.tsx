@@ -48,26 +48,19 @@ const Board = () => {
   const CELLS = useMemo(() => {
     return Array.from({ length: 8 }, (_, ind) => {
       return Array.from({ length: 8 }, (_, i) => {
-        return <Cell row={ind + 1} column={i + 1} id={ind * 8 + i + 1} />;
-      }).reverse();
+        return (
+          <Cell
+            key={ind * 8 + i + 1}
+            row={ind + 1}
+            column={i + 1}
+            id={ind * 8 + i + 1}
+          />
+        );
+      });
     });
   }, []);
 
-  return (
-    <div
-      className={s.board}
-      onClick={(e) => {
-        const dataset = (e.target as HTMLElement).dataset;
-        onClick(
-          parseInt(dataset.row),
-          parseInt(dataset.column),
-          parseInt(dataset.id)
-        );
-      }}
-    >
-      {CELLS}
-    </div>
-  );
+  return <div className={s.board}>{CELLS.flat()}</div>;
 };
 
 export default Board;

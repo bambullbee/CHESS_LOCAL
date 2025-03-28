@@ -58,15 +58,23 @@ const boardSlice = createSlice({
   initialState,
   reducers: {
     changeChosenCell(state, action: PayloadAction<number | null>) {
+      if (state.chosenCell) {
+        state.cells[state.chosenCell].attacks.forEach((id) => {
+          state.cells[id].isAttacked = false;
+        });
+      }
+      if (action.payload === state.chosenCell || action.payload === null) {
+        state.chosenCell = null;
+        return;
+      }
       state.chosenCell = action.payload;
-    },
-    changeAttackedState(state, action: PayloadAction<number>) {
-      state.cells[action.payload].isAttacked =
-        !state.cells[action.payload].isAttacked;
+      state.cells[action.payload].attacks.forEach((id) => {
+        state.cells[id].isAttacked = true;
+      });
     },
   },
 });
 
 export default boardSlice.reducer;
 
-export const { changeChosenCell, changeAttackedState } = boardSlice.actions;
+export const { changeChosenCell } = boardSlice.actions;

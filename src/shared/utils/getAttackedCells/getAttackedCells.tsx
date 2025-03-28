@@ -1,5 +1,4 @@
 import { FigureType } from "../../types/chessTypes";
-import useSelectorTs from "@/shared/withTypesHooks/useSelector";
 
 interface handlerProps {
   figure: "pawn";
@@ -14,14 +13,81 @@ type strictProps =
 const isCellTheSameRow = (idFirst: number, idSecond: number): boolean => {
   if (Math.ceil(idFirst / 8) === Math.ceil(idSecond / 8)) {
     return true;
-  } else {
-    return false;
   }
+  return false;
+};
+
+const isNumberInRange = (start: number, end: number) => {
+  return (id: number) => {
+    return start < id && id < end;
+  };
+};
+
+const isOnBoard = isNumberInRange(0, 64);
+
+const rangeToCheck = [1, 2, 3, 4, 5, 6, 7, 8];
+
+const signsToCheck = [
+  [1, 1],
+  [1, -1],
+  [-1, 1],
+  [-1, -1],
+];
+
+const extendedSignsToCheck = signsToCheck.concat([
+  [0, 1],
+  [0, -1],
+  [1, 0],
+  [-1, 0],
+]);
+
+const getDiagonalFields = (id: number): number[] => {
+  const res: number[] = [];
+  signsToCheck.forEach((signs) => {
+    rangeToCheck.forEach((range) => {
+      const sameColDiffRow = id + signs[0] * range * 8;
+      const resultId = sameColDiffRow + signs[1] * range;
+      if (isOnBoard(sameColDiffRow)) {
+        if (isCellTheSameRow(sameColDiffRow, resultId)) {
+          res.push(resultId);
+        }
+      }
+    });
+  });
+  return res;
+};
+
+const getPerpendicularFields = (id: number): number[] => {
+  const res: number[] = [];
+  let startRowId: number;
+  if (id % 8 !== 0) {
+    startRowId = id % 8;
+  } else {
+    startRowId = 8;
+  }
+  let startColId: number;
+  if (id % 8 !== 0) {
+    startColId = Math.floor(id / 8) * 8 + 1;
+  } else {
+    startColId = Math.floor((id - 1) / 8) * 8 + 1;
+  }
+
+  rangeToCheck.forEach((range) => {
+    const inNewRow = startRowId + 8 * (range - 1);
+    if (inNewRow !== id) {
+      res.push(inNewRow);
+    }
+    const inNewCol = startColId + 1 * (range - 1);
+    if (inNewCol !== id) {
+      res.push(inNewCol);
+    }
+  });
+
+  return res;
 };
 
 const getAttackedCells = ({ figure, id, side }: strictProps): number[] => {
   let plusOrMinus;
-  const cells = useSelectorTs((state) => state.board.cells);
   if (side === 1) {
     plusOrMinus = 1;
   } else {
@@ -32,56 +98,65 @@ const getAttackedCells = ({ figure, id, side }: strictProps): number[] => {
 
   switch (figure) {
     case "pawn":
-      //не стоит ли у A-H края доски пешка
-      if (cells[nextRowFigure]) {
-        //не стоит ли у 1-8 края доски пешка
+      if (isOnBoard(nextRowFigure)) {
         if (id % 8 === 0) {
           return [nextRowFigure - 1];
         }
-        if (id % 8 === 7) {
+
+        if (id % 8 === 1) {
           return [nextRowFigure + 1];
         }
+
         return [nextRowFigure - 1, nextRowFigure + 1];
       }
     case "knight":
       const res = [];
-      //top
-      if (cells[id - 8 * 2]) {
-        if (cells[id - 8 * 2 - 1]) {
+
+      if (isOnBoard(id - 8 * 2)) {
+        if (isCellTheSameRow(id, id - 1)) {
           res.push(id - 8 * 2 - 1);
         }
-        if (cells[id - 8 * 2 + 1]) {
+
+        if (isCellTheSameRow(id, id + 1)) {
           res.push(id - 8 * 2 + 1);
         }
       }
-      //bottom
-      if (cells[id + 8 * 2]) {
-        if (cells[id + 8 * 2 - 1]) {
-          res.push(id - 8 * 2 - 1);
+      if (isOnBoard(id + 8 * 2)) {
+        if (isCellTheSameRow(id, id - 1)) {
+          res.push(id + 8 * 2 - 1);
         }
-        if (cells[id + 8 * 2 + 1]) {
-          res.push(id - 8 * 2 + 1);
+
+        if (isCellTheSameRow(id, id + 1)) {
+          res.push(id + 8 * 2 + 1);
         }
       }
-      //right
       if (isCellTheSameRow(id, id + 2)) {
-        if (cells[id + 8]) {
+        if (isOnBoard(id + 8)) {
           res.push(id + 2 + 8);
         }
-        if (cells[id - 8]) {
+
+        if (isOnBoard(id - 8)) {
           res.push(id + 2 - 8);
         }
       }
-      //left
       if (isCellTheSameRow(id, id - 2)) {
-        if (cells[id + 8]) {
+        if (isOnBoard(id + 8)) {
           res.push(id - 2 + 8);
         }
-        if (cells[id - 8]) {
+
+        if (isOnBoard(id - 8)) {
           res.push(id - 2 - 8);
         }
       }
       return res;
+    case "bishop":
+      return getDiagonalFields(id);
+    case "rook":
+      return getPerpendicularFields(id);
+    case "queen":
+      return getDiagonalFields(id).concat(getPerpendicularFields(id));
+    case "king":
+      return [];
     default:
       return [];
   }

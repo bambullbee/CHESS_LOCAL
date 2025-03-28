@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import s from "./Cell.module.css";
 import useSelectorTs from "@/shared/withTypesHooks/useSelector";
 import { useDispatchTs } from "@/shared";
-import { changeAttackedState, changeChosenCell } from "@/app";
+import { changeChosenCell } from "@/app";
 
 interface CellP {
   row: number;
@@ -37,26 +37,29 @@ const Cell = ({ row, column, id }: CellP) => {
   const onClick = () => {
     if (chosenCell === null) {
       dispatch(changeChosenCell(id));
+    } else if (chosenCell === id) {
+      dispatch(changeChosenCell(null));
+    } else {
+      dispatch(changeChosenCell(id));
     }
-    attacks.forEach((id) => {
-      dispatch(changeAttackedState(id));
-    });
   };
 
   return (
     <button
       className={s.cell}
       style={{
-        backgroundColor: isAttacked ? "blue" : squareColor,
+        backgroundColor:
+          chosenCell === id ? "blue" : isAttacked ? "yellow" : squareColor,
         color: color === "white" ? "pink" : "brown",
       }}
       onClick={onClick}
     >
-      {figure}, r{row}, c{column}
+      {row + " " + column},{figure ? figure + ", " : ""}
+      {id}, {isAttacked ? "t" : "f"}, {attacks.join(" ")}
     </button>
   );
 };
 
-export default Cell;
+export default memo(Cell);
 
 export type { CellP };
