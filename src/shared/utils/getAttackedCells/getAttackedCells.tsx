@@ -57,6 +57,10 @@ const getDiagonalFields = (id: number): number[] => {
   return res;
 };
 
+const isDiagonalFieldDefendsFromCheck = (handler: () => void) => {
+  return;
+};
+
 const getPerpendicularFields = (id: number): number[] => {
   const res: number[] = [];
   let startRowId: number;
@@ -165,9 +169,9 @@ const getAttackedCells = ({ figure, id, side }: strictProps): number[] => {
               return id + firstSummand + secondSummand;
             }
           }
-          return [];
+          return 0;
         })
-        .flat();
+        .filter((id) => id !== 0);
     default:
       return [];
   }

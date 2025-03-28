@@ -5,30 +5,22 @@ import { getAttackedCells } from "@/shared";
 
 import type { Cell } from "@/shared";
 
-type rowsNcols = number[][];
-
 interface Cells {
   [key: number]: Cell;
 }
 
 interface initialStateI {
-  rows: rowsNcols;
   cells: Cells;
   chosenCell: number | null;
 }
 
 const CELLS: Cells = {};
 
-const ROWS: rowsNcols = Array.from({ length: 8 }, () =>
-  Array.from({ length: 8 })
-);
-
 for (let e = 0; e <= 7; e++) {
   for (let i = 0; i <= 7; i++) {
     const id = (e + 1) * 8 - (8 - i - 1);
     const startFigure = getStartFigure(e + 1, i + 1);
 
-    ROWS[e][i] = id;
     CELLS[id] = {
       figure: startFigure,
       attacks: getAttackedCells({ figure: startFigure, id, side: null }),
@@ -47,8 +39,22 @@ for (let e = 0; e <= 7; e++) {
   }
 }
 
+for (let key in CELLS) {
+  CELLS[key].attacks.forEach((id) => {
+    switch (CELLS[key].figure) {
+      case "bishop":
+
+      case "rook":
+
+      case "queen":
+
+      default:
+        return;
+    }
+  });
+}
+
 const initialState: initialStateI = {
-  rows: ROWS,
   cells: CELLS,
   chosenCell: null,
 };
