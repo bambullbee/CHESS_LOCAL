@@ -156,7 +156,18 @@ const getAttackedCells = ({ figure, id, side }: strictProps): number[] => {
     case "queen":
       return getDiagonalFields(id).concat(getPerpendicularFields(id));
     case "king":
-      return [];
+      return extendedSignsToCheck
+        .map((signs: [number, number]) => {
+          const firstSummand = signs[0] * 8;
+          const secondSummand = signs[1] * 1;
+          if (isOnBoard(firstSummand + id)) {
+            if (isCellTheSameRow(id, id + secondSummand)) {
+              return id + firstSummand + secondSummand;
+            }
+          }
+          return [];
+        })
+        .flat();
     default:
       return [];
   }
