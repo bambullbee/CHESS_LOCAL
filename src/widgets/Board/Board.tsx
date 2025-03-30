@@ -2,7 +2,12 @@ import { useMemo, useState } from "react";
 
 import s from "./Board.module.css";
 import { Cell } from "@/entities/Cell";
-import { FigureType } from "@/shared";
+import {
+  FigureColor,
+  FigureType,
+  useDispatchTs,
+  useSelectorTs,
+} from "@/shared";
 
 type cellHandler = (row: number, col: number, id: number) => void;
 
@@ -14,8 +19,7 @@ interface chosenCell {
 }
 
 const Board = () => {
-  const [firstChosenCell, setFirstChosenCell] = useState<chosenCell>(null);
-  const [secondChosenCell, setSecondChosenCell] = useState<chosenCell>(null);
+  const cells = useSelectorTs((state) => state.board.cells);
 
   const CELLS = useMemo(() => {
     return Array.from({ length: 8 }, (_, ind) => {

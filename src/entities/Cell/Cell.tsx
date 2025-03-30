@@ -1,9 +1,9 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 
 import s from "./Cell.module.css";
 import useSelectorTs from "@/shared/withTypesHooks/useSelector";
-import { useDispatchTs } from "@/shared";
-import { changeChosenCell } from "@/app";
+import { FigureColor, FigureType, useDispatchTs } from "@/shared";
+import { getCellNewInfo } from "@/app";
 
 interface CellP {
   row: number;
@@ -27,35 +27,31 @@ const Cell = ({ row, column, id }: CellP) => {
     }
   }, []);
 
-  const { figure, color, isAttacked, attacks } = useSelectorTs(
-    (state) => state.board.cells[id]
-  );
-  const chosenCell = useSelectorTs((state) => state.board.chosenCell);
+  const {
+    figure,
+    color,
+    attacks: { availableCells },
+  } = useSelectorTs((state) => state.board.cells[id]);
 
   const dispatch = useDispatchTs();
 
-  const onClick = () => {
-    if (chosenCell === null) {
-      dispatch(changeChosenCell(id));
-    } else if (chosenCell === id) {
-      dispatch(changeChosenCell(null));
-    } else {
-      dispatch(changeChosenCell(id));
-    }
-  };
+  useEffect(() => {
+    dispatch(getCellNewInfo({ id, shouldInitialize: true }));
+  }, []);
+
+  // const onClick = () => {
+  //   dispatch(changeChosenCell(id))
+  // }
 
   return (
     <button
       className={s.cell}
       style={{
-        backgroundColor:
-          chosenCell === id ? "blue" : isAttacked ? "yellow" : squareColor,
-        color: color === "white" ? "pink" : "brown",
+        backgroundColor: squareColor,
+        color: "pink",
       }}
-      onClick={onClick}
     >
-      {row + " " + column},{figure ? figure + ", " : ""}
-      {id}, {isAttacked ? "t" : "f"}, {attacks.join(" ")}
+      {id}, {figure}, {color}
     </button>
   );
 };
