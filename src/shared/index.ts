@@ -4,6 +4,7 @@ import { useDispatchTs } from "./withTypesHooks/useDispatch";
 import { getAttackedCells } from "./utils/getAttackedCells";
 import { getDiagonalFields } from "./utils/getAttackedCells/getAttackedCells";
 import getStartFigure from "./utils/getStartFigure";
+import createSelectorTs from "./withTypesHooks/createSelector";
 
 import type { FigureColor, FigureType } from "./types/chessTypes";
 import type {
@@ -15,6 +16,7 @@ import type {
 
 export {
   createAsyncThunkTs,
+  createSelectorTs,
   useSelectorTs,
   useDispatchTs,
   getAttackedCells,

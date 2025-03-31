@@ -58,7 +58,7 @@ const getPerpendicularFields = (
   state: Cells = null
 ): processedLongRangeAttackers => {
   const handler = getDiversedResults();
-  return logic(signsToCheckD, state, id, handler);
+  return logic(signsToCheckP, state, id, handler);
 };
 
 const getAttackedCells = ({
@@ -121,7 +121,8 @@ const getAttackedCells = ({
         if (!Boolean(state[nextRowFigure].figure)) {
           res.availableCells.push(nextRowFigure);
         }
-      } else if (
+      }
+      if (
         isOnBoard(doubleNextRowFigure) &&
         !Boolean(state[doubleNextRowFigure].figure)
       ) {
@@ -153,9 +154,10 @@ const getAttackedCells = ({
           ? [8]
           : null,
       };
-      const subHandler = (key: string, value: number) => {
+      const subHandler = (key: string, value: number, isTop: boolean) => {
         availableZones[key]?.forEach((val) => {
-          if (val) {
+          const isSubTop: boolean = Math.abs(val) === 2;
+          if (val && isTop !== isSubTop) {
             //необходимая логика по работе с полем вся здесь
             const resultId = id + value + val;
             res.availableCells.push(resultId);
@@ -166,15 +168,17 @@ const getAttackedCells = ({
         });
       };
       availableZones.top?.forEach((value) => {
+        const isTop = Math.abs(value) === 16;
         if (value) {
-          subHandler("left", value);
-          subHandler("right", value);
+          subHandler("left", value, isTop);
+          subHandler("right", value, isTop);
         }
       });
       availableZones.bottom?.forEach((value) => {
+        const isTop = Math.abs(value) === 16;
         if (value) {
-          subHandler("left", value);
-          subHandler("right", value);
+          subHandler("left", value, isTop);
+          subHandler("right", value, isTop);
         }
       });
       return res;
@@ -206,7 +210,8 @@ const getAttackedCells = ({
                   resultId
                 ].attacked.whoIsFieldUnderAttackBy.attackerColor.includes(
                   potentialAttackerColor
-                )
+                ) &&
+                state[resultId].color !== state[id].color
               ) {
                 return resultId;
               }

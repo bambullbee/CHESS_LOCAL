@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 
 import {
   getAttackedCells,
@@ -88,32 +88,34 @@ const boardSlice = createSlice({
         startFigure = figure;
         color = colour;
       }
+      cell.figure = startFigure;
+      cell.color = color;
+    },
+    getAttackingInfo: (state, { payload }) => {
       let attackingInfo: processedLongRangeAttackers;
-      if (startFigure === "pawn") {
+      if (state.cells[payload].figure === "pawn") {
         attackingInfo = getAttackedCells({
-          figure: startFigure,
-          id,
-          side: color === "white" ? 1 : 8,
+          figure: "pawn",
+          id: payload,
+          side: state.cells[payload].color === "white" ? 1 : 8,
           state,
         });
       } else {
         attackingInfo = getAttackedCells({
-          figure: startFigure,
-          id,
+          figure: state.cells[payload].figure,
+          id: payload,
           side: null,
           state,
         });
       }
-
+      //???
       if (attackingInfo) {
         const { range, availableCells, frozenId, doesAttackKing } =
           attackingInfo;
-        cell.figure = startFigure;
-        cell.color = color;
-
+        const cell = state.cells[payload];
         const attacks = cell.attacks;
 
-        attacks.availableCells = availableCells;
+        attacks.availableCells = availableCells.filter((id) => id);
         attacks.doesAttackKing = doesAttackKing;
 
         if (range) {
@@ -125,13 +127,22 @@ const boardSlice = createSlice({
         if (frozenId) {
           state.cells[frozenId].attacked.isFrozen = true;
         }
-        availableCells.forEach((attackedId) => {
-          const obj = state.cells[attackedId].attacked.whoIsFieldUnderAttackBy;
 
-          obj.directly.push(id);
-
-          if (!obj.attackerColor.includes(color)) {
-            obj.attackerColor.push();
+        attacks.availableCells.forEach((attackedId) => {
+          state.cells[
+            attackedId
+          ].attacked.whoIsFieldUnderAttackBy.directly.push(payload);
+          const readableState = current(state);
+          if (
+            !readableState.cells[
+              attackedId
+            ].attacked.whoIsFieldUnderAttackBy.attackerColor.includes(
+              cell.color
+            )
+          ) {
+            state.cells[
+              attackedId
+            ].attacked.whoIsFieldUnderAttackBy.attackerColor.push(cell.color);
           }
         });
       }
@@ -141,13 +152,13 @@ const boardSlice = createSlice({
         if (
           state.chosenCell === payload ||
           !Boolean(state.cells[payload].figure) ||
-          state.turn !== state.cells[payload].color
+          state.cells[payload].color !== state.turn
         ) {
           state.chosenCell = null;
-        } else {
+        } else if (state.turn === state.cells[payload].color) {
           state.chosenCell = payload;
         }
-      } else if (Boolean(state.cells[payload].figure)) {
+      } else if (state.cells[payload].color === state.turn) {
         state.chosenCell = payload;
       }
     },
@@ -156,4 +167,5 @@ const boardSlice = createSlice({
 
 export default boardSlice.reducer;
 
-export const { getCellNewInfo } = boardSlice.actions;
+export const { getCellNewInfo, changeChosenCell, getAttackingInfo } =
+  boardSlice.actions;
