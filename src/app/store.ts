@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
-import boardReducer from "./slices/boardSlice";
+import boardReducer from "./slices/boardSlice/boardSlice";
 
 export const store = configureStore({
   reducer: {

@@ -17,7 +17,7 @@ interface handlerProps {
   figure: "pawn";
   id: number;
   side: 1 | 8;
-  state?: Cells;
+  state?: initialStateI;
 }
 
 type strictProps =
@@ -26,7 +26,7 @@ type strictProps =
       figure: Exclude<FigureType, "pawn">;
       id: number;
       side?: null;
-      state?: Cells;
+      state?: initialStateI;
     };
 
 const signsToCheckD: [number, number][] = [
@@ -67,7 +67,7 @@ const getAttackedCells = ({
   side,
   state: proxyState,
 }: strictProps): processedLongRangeAttackers => {
-  const state = (current(proxyState) as unknown as initialStateI).cells;
+  const state = current(proxyState) as unknown as initialStateI;
   let plusOrMinus;
   if (side === 1) {
     plusOrMinus = 1;
@@ -84,9 +84,9 @@ const getAttackedCells = ({
       const nextRowFigure = id + plusOrMinus * 8;
       const doubleNextRowFigure = nextRowFigure + plusOrMinus * 8;
       const left = nextRowFigure - 1;
-      const leftCell = state[left];
+      const leftCell: Cell = state.cells[left];
       const right = nextRowFigure + 1;
-      const rightCell = state[right];
+      const rightCell: Cell = state.cells[right];
       const handler = (cell: Cell, id: number) => {
         if (cell.figure || cell.withPawnStep) {
           if (cell.figure === "king") {
@@ -118,13 +118,13 @@ const getAttackedCells = ({
             res.doesAttackKing = is;
           }
         }
-        if (!Boolean(state[nextRowFigure].figure)) {
+        if (!Boolean(state.cells[nextRowFigure].figure)) {
           res.availableCells.push(nextRowFigure);
         }
       }
       if (
         isOnBoard(doubleNextRowFigure) &&
-        !Boolean(state[doubleNextRowFigure].figure)
+        !Boolean(state.cells[doubleNextRowFigure].figure)
       ) {
         res.availableCells.push(doubleNextRowFigure);
       }
@@ -161,7 +161,7 @@ const getAttackedCells = ({
             //необходимая логика по работе с полем вся здесь
             const resultId = id + value + val;
             res.availableCells.push(resultId);
-            if (state[resultId].figure === "king") {
+            if (state.cells[resultId].figure === "king") {
               res.doesAttackKing = true;
             }
           }
@@ -183,12 +183,12 @@ const getAttackedCells = ({
       });
       return res;
     case "bishop":
-      return getDiagonalFields(id, state);
+      return getDiagonalFields(id, state.cells);
     case "rook":
-      return getPerpendicularFields(id, state);
+      return getPerpendicularFields(id, state.cells);
     case "queen":
-      const queenD = getDiagonalFields(id, state);
-      const queenP = getPerpendicularFields(id, state);
+      const queenD = getDiagonalFields(id, state.cells);
+      const queenP = getPerpendicularFields(id, state.cells);
       return {
         availableCells: queenD.availableCells.concat(queenP.availableCells),
         range: queenD.range.concat(queenP.range),
@@ -202,16 +202,16 @@ const getAttackedCells = ({
           const secondSummand = signs[1] * 1;
           const resultId = id + firstSummand + secondSummand;
           const potentialAttackerColor =
-            state[id].color === "black" ? "white" : "black";
+            state.cells[id].color === "black" ? "white" : "black";
           if (isOnBoard(firstSummand + id)) {
             if (isCellTheSameRow(id, id + secondSummand)) {
               if (
-                !state[
+                !state.cells[
                   resultId
                 ].attacked.whoIsFieldUnderAttackBy.attackerColor.includes(
                   potentialAttackerColor
                 ) &&
-                state[resultId].color !== state[id].color
+                state.cells[resultId].color !== state.cells[id].color
               ) {
                 return resultId;
               }

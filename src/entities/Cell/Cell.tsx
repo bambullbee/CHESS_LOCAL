@@ -8,7 +8,12 @@ import {
   FigureType,
   useDispatchTs,
 } from "@/shared";
-import { changeChosenCell, getAttackingInfo, getCellNewInfo } from "@/app";
+import {
+  changeChosenCell,
+  getAttackingInfo,
+  getCellNewInfo,
+  moveFigure,
+} from "@/app";
 
 interface CellP {
   row: number;
@@ -69,10 +74,13 @@ const Cell = ({ row, column, id }: CellP) => {
   }, []);
 
   const onClick = () => {
-    dispatch(changeChosenCell(id));
+    if (availableToBeSteped) {
+      dispatch(moveFigure(id));
+      dispatch(changeChosenCell(null));
+    } else {
+      dispatch(changeChosenCell(id));
+    }
   };
-
-  console.log(id);
 
   return (
     <button

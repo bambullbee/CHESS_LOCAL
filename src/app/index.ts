@@ -3,7 +3,8 @@ import {
   getCellNewInfo,
   changeChosenCell,
   getAttackingInfo,
-} from "./slices/boardSlice";
+  moveFigure,
+} from "./slices/boardSlice/boardSlice";
 import { store } from "./store";
 
 import type { RootState } from "./store";
@@ -14,5 +15,6 @@ export {
   getCellNewInfo,
   changeChosenCell,
   getAttackingInfo,
+  moveFigure,
   type RootState,
 };

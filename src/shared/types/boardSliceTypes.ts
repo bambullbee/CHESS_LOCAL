@@ -10,19 +10,36 @@ interface Cell {
     range: null | number[];
     //клетки, куда может походить, с учетом первого препятствия(bqr, пешки...?, для короля сразу указывать клетки не атакованные противником)
     availableCells: number[];
+    isFreezer: { is: boolean; target: number };
   };
   attacked: {
     //проверка на isFrozen будет решать, можно ли фигурой ходить
-    isFrozen: boolean;
+    isFrozen: { is: boolean; byWhom: number };
     whoIsFieldUnderAttackBy: {
       //надо для гайд-версии. если массив не пустой, то король туда не может ходить. при проверке достаем айди из этого массива и cells[id].attacks.range перепроверяем
       directly: number[];
       //пока что не нахожу применения этой штуке, но можно использовать для эффектов, как на личес
       through: number[];
+      //необходимо для проверки этих тиммейтов после того, как сама фигура подвинется. необходимо добавлять сюда только bqr, так как только их атаки могут меняться после продвижения фигуры
       attackerColor: FigureColor[];
     };
   };
   withPawnStep: boolean;
+}
+
+interface initialStateI {
+  cells: Cells;
+  chosenCell: number | null;
+  check: {
+    black: { is: boolean; byWhom: number[] };
+    white: { is: boolean; byWhom: number[] };
+  };
+  turn: FigureColor;
+  pawnStep: {
+    is: boolean;
+    pawn: number;
+    steppedField: number;
+  };
 }
 
 interface Cells {
@@ -43,16 +60,6 @@ type handler = (
   shouldReturn?: boolean,
   shouldReset?: boolean
 ) => processedLongRangeAttackers;
-
-interface initialStateI {
-  cells: Cells;
-  chosenCell: number | null;
-  check: {
-    black: boolean;
-    white: boolean;
-  };
-  turn: FigureColor;
-}
 
 export type {
   Cell,
