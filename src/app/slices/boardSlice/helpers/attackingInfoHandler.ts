@@ -10,6 +10,7 @@ const attackingInfoHandler = (proxyState: initialStateI, payload: number) => {
   const state = JSON.parse(
     JSON.stringify(proxyState)
   ) as unknown as initialStateI;
+  const prevFrozenId = state.cells[payload].attacks.isFreezer.target;
   if (state.cells[payload].figure === "pawn") {
     attackingInfo = getAttackedCells({
       figure: "pawn",
@@ -71,6 +72,16 @@ const attackingInfoHandler = (proxyState: initialStateI, payload: number) => {
         is: false,
         target: null,
         pathTowardsKing: [],
+      };
+    }
+    if (
+      !frozenId &&
+      prevFrozenId &&
+      state.cells?.[prevFrozenId].attacked.isFrozen.byWhom === payload
+    ) {
+      state.cells[prevFrozenId].attacked.isFrozen = {
+        is: false,
+        byWhom: null,
       };
     }
 

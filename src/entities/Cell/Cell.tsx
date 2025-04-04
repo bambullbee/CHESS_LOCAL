@@ -29,6 +29,7 @@ interface CellP {
 }
 
 const Cell = ({ row, column, id }: CellP) => {
+  const shouldShowInfo = true;
   //заменить хардкод цветов на получение цветов из стора-тема
   const squareColor = useMemo(() => {
     if (row % 2 === 0) {
@@ -58,10 +59,9 @@ const Cell = ({ row, column, id }: CellP) => {
           }
           return false;
         },
-        (state) =>
-          state.board.cells[id].attacked.whoIsFieldUnderAttackBy.directly,
+        (state) => state.board.cells[id].attacked.whoIsFieldUnderAttackBy,
         (state) => {
-          return state.board.cells[id].attacked.isFrozen;
+          return state.board.cells[id].attacked.isFrozen.is;
         },
         (state) => state.board.cells[id].withPawnStep,
         (state) => state.board.cells[id].attacked.isFrozen.byWhom,
@@ -93,6 +93,7 @@ const Cell = ({ row, column, id }: CellP) => {
     color,
     isChosen,
     availableToBeSteped,
+    whoIsFieldUnderAttackBy,
     isFrozen,
     withPawnStep,
     byWhom,
@@ -162,12 +163,18 @@ const Cell = ({ row, column, id }: CellP) => {
           : availableToBeSteped
           ? "yellow"
           : squareColor,
-        color: "pink",
+        color: figure ? "red" : "black",
       }}
       onClick={onClick}
     >
-      {figure + " " + color}, isCh: {isChosen ? "tr" : "fa"}, isFr:
-      {isFrozen ? "tr" : "fa"}, byWh: {byWhom}
+      {shouldShowInfo
+        ? `${id + "" + figure + " " + color}, ${
+            "d " +
+            whoIsFieldUnderAttackBy.directly.join(",") +
+            "t " +
+            whoIsFieldUnderAttackBy.through.join(",")
+          }`
+        : cellFigure}
     </button>
   );
 };

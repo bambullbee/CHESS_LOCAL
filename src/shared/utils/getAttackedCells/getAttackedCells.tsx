@@ -233,7 +233,6 @@ const getAttackedCells = ({
             state.cells[id].color === "black" ? "white" : "black";
           if (isOnBoard(firstSummand + id)) {
             if (isCellTheSameRow(id, id + secondSummand)) {
-              console.log(resultId, "king available cell");
               if (
                 !state.cells[
                   resultId

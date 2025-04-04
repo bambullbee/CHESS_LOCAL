@@ -144,6 +144,22 @@ const boardSlice = createSlice({
             ) {
               return state;
             }
+            if (state.cells[payload].withPawnStep) {
+              const pawnCell = JSON.parse(
+                JSON.stringify(state.cells[state.pawnStep.pawn])
+              ) as unknown as Cell;
+              state.cells[state.pawnStep.pawn] = emptyCell;
+              pawnCell.attacked.whoIsFieldUnderAttackBy.through.forEach(
+                (attackerId) => {
+                  if (
+                    state.cells[attackerId].color ===
+                    state.cells[state.chosenCell].color
+                  ) {
+                    state = attackingInfoHandler(state, attackerId);
+                  }
+                }
+              );
+            }
           }
         }
 
@@ -183,9 +199,6 @@ const boardSlice = createSlice({
         }
         const currCellDirectly = [
           ...state.cells[payload].attacked.whoIsFieldUnderAttackBy.directly,
-        ];
-        const currCellThrough = [
-          ...state.cells[payload].attacked.whoIsFieldUnderAttackBy.through,
         ];
         state.cells[payload].figure = cc.figure;
         state.cells[payload].color = cc.color;
@@ -245,19 +258,23 @@ const boardSlice = createSlice({
           state = attackingInfoHandler(state, id);
         });
         state.turn = state.turn === "white" ? "black" : "white";
-      }
-      if (
-        cc.figure === "king" &&
-        state.cells[payload].attacked.whoIsFieldUnderAttackBy.through.length > 0
-      ) {
-        state.cells[payload].attacked.whoIsFieldUnderAttackBy.through.forEach(
-          (attackerId) => {
+        if (cc.figure === "king") {
+          state.cells[payload].attacked.whoIsFieldUnderAttackBy.through.forEach(
+            (attackerId) => {
+              if (state.cells[attackerId].color !== cc.color) {
+                state = attackingInfoHandler(state, attackerId);
+              }
+            }
+          );
+          cc.attacked.whoIsFieldUnderAttackBy.through.forEach((attackerId) => {
             if (state.cells[attackerId].color !== cc.color) {
               state = attackingInfoHandler(state, attackerId);
             }
-          }
-        );
+          });
+          state.kingId[cc.color] = payload;
+        }
       }
+
       if (state.check[defenseSide].is) {
         if (state.check[defenseSide].byWhom.length > 1) {
           if (
