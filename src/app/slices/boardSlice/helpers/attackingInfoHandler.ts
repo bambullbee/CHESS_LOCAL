@@ -2,10 +2,14 @@ import {
   getAttackedCells,
   initialStateI,
   processedLongRangeAttackers,
+  attackingInfo,
 } from "@/shared";
 
-const attackingInfoHandler = (state: initialStateI, payload: number) => {
-  let attackingInfo: processedLongRangeAttackers;
+const attackingInfoHandler = (proxyState: initialStateI, payload: number) => {
+  let attackingInfo: attackingInfo;
+  const state = JSON.parse(
+    JSON.stringify(proxyState)
+  ) as unknown as initialStateI;
   if (state.cells[payload].figure === "pawn") {
     attackingInfo = getAttackedCells({
       figure: "pawn",
@@ -22,18 +26,28 @@ const attackingInfoHandler = (state: initialStateI, payload: number) => {
     });
   }
   if (attackingInfo) {
-    const { range, availableCells, frozenId, doesAttackKing } = attackingInfo;
+    const { range, availableCells, frozenId, doesAttackKing, towardsKing } =
+      attackingInfo;
     const cell = state.cells[payload];
     const attacks = cell.attacks;
-    attacks.availableCells = availableCells.filter((id) => id);
+    attacks.availableCells = [payload, ...availableCells.filter((id) => id)];
     attacks.doesAttackKing = doesAttackKing;
+    const defenseColor =
+      state.cells[payload].color === "black" ? "white" : "black";
     if (doesAttackKing) {
-      const defenseColor =
-        state.cells[payload].color === "black" ? "white" : "black";
       state.check[defenseColor] = {
         is: true,
-        byWhom: [...state.check[defenseColor].byWhom, payload],
+        byWhom: state.check[defenseColor].byWhom.some((id) => id === payload)
+          ? state.check[defenseColor].byWhom
+          : [...state.check[defenseColor].byWhom, payload],
       };
+      state.cells[payload].attacks.isFreezer.pathTowardsKing = towardsKing;
+    } else {
+      state.check[defenseColor].byWhom = state.check[
+        defenseColor
+      ].byWhom.filter((id) => id !== payload);
+      state.check[defenseColor].is =
+        state.check[defenseColor].byWhom.length === 0 ? false : true;
     }
 
     if (range) {
@@ -47,12 +61,35 @@ const attackingInfoHandler = (state: initialStateI, payload: number) => {
         is: true,
         byWhom: payload,
       };
+      state.cells[payload].attacks.isFreezer = {
+        is: true,
+        target: frozenId,
+        pathTowardsKing: towardsKing,
+      };
+    } else if (!doesAttackKing && !frozenId) {
+      state.cells[payload].attacks.isFreezer = {
+        is: false,
+        target: null,
+        pathTowardsKing: [],
+      };
     }
 
     attacks.availableCells.forEach((attackedId) => {
-      state.cells[attackedId].attacked.whoIsFieldUnderAttackBy.directly.push(
-        payload
-      );
+      if (
+        !(
+          state.cells[payload].figure === "pawn" &&
+          (attackedId - payload) % 8 === 0
+        ) &&
+        !state.cells[
+          attackedId
+        ].attacked.whoIsFieldUnderAttackBy.directly.includes(payload)
+      ) {
+        state.cells[attackedId].attacked.whoIsFieldUnderAttackBy.directly.push(
+          payload
+        );
+      } else {
+        //тут можно доделать для пешек, чтобы отображалось только то, куда они действительно могут пойти
+      }
       if (
         !state.cells[
           attackedId
@@ -67,7 +104,21 @@ const attackingInfoHandler = (state: initialStateI, payload: number) => {
         );
       }
     });
+    if (range.length > 0) {
+      attacks.range.forEach((attackedId) => {
+        if (
+          !state.cells[
+            attackedId
+          ].attacked.whoIsFieldUnderAttackBy.through.includes(payload)
+        ) {
+          state.cells[attackedId].attacked.whoIsFieldUnderAttackBy.through.push(
+            payload
+          );
+        }
+      });
+    }
   }
+  return state;
 };
 
 export default attackingInfoHandler;

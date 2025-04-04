@@ -7,6 +7,7 @@ import {
   handler,
   Cell,
   initialStateI,
+  attackingInfo,
 } from "../../types/boardSliceTypes";
 
 import getDiversedResults from "./helpers/getDiversedResults";
@@ -65,18 +66,19 @@ const getAttackedCells = ({
   figure,
   id,
   side,
-  state: proxyState,
-}: strictProps): processedLongRangeAttackers => {
-  const state = current(proxyState) as unknown as initialStateI;
+  state,
+}: strictProps): attackingInfo => {
   let plusOrMinus;
   if (side === 1) {
     plusOrMinus = 1;
   } else {
     plusOrMinus = -1;
   }
-  const res: processedLongRangeAttackers = {
+  const res: attackingInfo = {
     availableCells: [],
     doesAttackKing: false,
+    towardsKing: [],
+    range: [],
   };
 
   switch (figure) {
@@ -88,14 +90,10 @@ const getAttackedCells = ({
       const right = nextRowFigure + 1;
       const rightCell: Cell = state.cells[right];
       const handler = (cell: Cell, id: number) => {
-        if (cell.figure || cell.withPawnStep) {
-          if (cell.figure === "king") {
-            return { id, is: true };
-          }
-          return { id, is: false };
-        } else {
-          return { id: null, is: false };
+        if (cell.figure === "king") {
+          return { id, is: true };
         }
+        return { id, is: false };
       };
       if (isOnBoard(nextRowFigure)) {
         if (id % 8 === 0) {
@@ -107,12 +105,12 @@ const getAttackedCells = ({
           res.availableCells.push(id);
           res.doesAttackKing = is;
         } else {
-          if (leftCell.figure || leftCell.withPawnStep) {
+          {
             const { id, is } = handler(leftCell, left);
             res.availableCells.push(id);
             res.doesAttackKing = is;
           }
-          if (rightCell.figure || rightCell.withPawnStep) {
+          {
             const { id, is } = handler(rightCell, right);
             res.availableCells.push(id);
             res.doesAttackKing = is;
@@ -124,7 +122,8 @@ const getAttackedCells = ({
       }
       if (
         isOnBoard(doubleNextRowFigure) &&
-        !Boolean(state.cells[doubleNextRowFigure].figure)
+        !Boolean(state.cells[doubleNextRowFigure].figure) &&
+        !isOnBoard(id + plusOrMinus * 16 * -1)
       ) {
         res.availableCells.push(doubleNextRowFigure);
       }
@@ -158,10 +157,12 @@ const getAttackedCells = ({
         availableZones[key]?.forEach((val) => {
           const isSubTop: boolean = Math.abs(val) === 2;
           if (val && isTop !== isSubTop) {
-            //необходимая логика по работе с полем вся здесь
             const resultId = id + value + val;
             res.availableCells.push(resultId);
-            if (state.cells[resultId].figure === "king") {
+            if (
+              state.cells[resultId].figure === "king" &&
+              state.cells[resultId].color !== state.cells[id].color
+            ) {
               res.doesAttackKing = true;
             }
           }
@@ -182,18 +183,45 @@ const getAttackedCells = ({
         }
       });
       return res;
-    case "bishop":
-      return getDiagonalFields(id, state.cells);
-    case "rook":
-      return getPerpendicularFields(id, state.cells);
+    case "bishop": {
+      const { availableCells, range, frozenId, doesAttackKing, towardsKing } =
+        getDiagonalFields(id, state.cells);
+      return {
+        availableCells,
+        range,
+        frozenId,
+        doesAttackKing,
+        towardsKing: towardsKing.path,
+      };
+    }
+    case "rook": {
+      const { availableCells, range, frozenId, doesAttackKing, towardsKing } =
+        getPerpendicularFields(id, state.cells);
+      return {
+        availableCells,
+        range,
+        frozenId,
+        doesAttackKing,
+        towardsKing: towardsKing.path,
+      };
+    }
     case "queen":
       const queenD = getDiagonalFields(id, state.cells);
       const queenP = getPerpendicularFields(id, state.cells);
+
       return {
         availableCells: queenD.availableCells.concat(queenP.availableCells),
         range: queenD.range.concat(queenP.range),
         frozenId: queenD.frozenId || queenP.frozenId,
         doesAttackKing: queenD.doesAttackKing || queenP.doesAttackKing,
+        towardsKing:
+          (queenD.towardsKing.isCompletedPath
+            ? queenD.towardsKing.path
+            : null) ||
+          (queenP.towardsKing.isCompletedPath
+            ? queenP.towardsKing.path
+            : null) ||
+          [],
       };
     case "king":
       res.availableCells = extendedSignsToCheck
@@ -205,15 +233,38 @@ const getAttackedCells = ({
             state.cells[id].color === "black" ? "white" : "black";
           if (isOnBoard(firstSummand + id)) {
             if (isCellTheSameRow(id, id + secondSummand)) {
+              console.log(resultId, "king available cell");
               if (
                 !state.cells[
                   resultId
                 ].attacked.whoIsFieldUnderAttackBy.attackerColor.includes(
                   potentialAttackerColor
-                ) &&
-                state.cells[resultId].color !== state.cells[id].color
+                )
               ) {
                 return resultId;
+              }
+              if (
+                state.cells[resultId].color === potentialAttackerColor &&
+                state.cells[resultId].figure
+              ) {
+                if (
+                  state.cells[
+                    resultId
+                  ].attacked.whoIsFieldUnderAttackBy.directly.every(
+                    (attackerId) => {
+                      if (attackerId !== resultId) {
+                        return (
+                          state.cells[attackerId].color !==
+                          potentialAttackerColor
+                        );
+                      } else {
+                        return true;
+                      }
+                    }
+                  )
+                ) {
+                  return resultId;
+                }
               }
             }
           }

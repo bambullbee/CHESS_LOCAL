@@ -20,6 +20,7 @@ interface chosenCell {
 }
 
 const Board = () => {
+  const state = useSelectorTs((state) => state.board);
   const CELLS = useMemo(() => {
     return Array.from({ length: 8 }, (_, ind) => {
       return Array.from({ length: 8 }, (_, i) => {
@@ -29,7 +30,15 @@ const Board = () => {
     });
   }, []);
 
-  return <div className={s.board}>{CELLS.flat()}</div>;
+  return (
+    <>
+      <div className={s.board}>{CELLS.flat()}</div>
+      <div>Check: {JSON.stringify(state.check)}</div>
+      <div>PawnStep: {JSON.stringify(state.pawnStep)}</div>
+      <div>KingId: {JSON.stringify(state.kingId)}</div>
+      <div>Turn: {state.turn}</div>
+    </>
+  );
 };
 
 export default Board;

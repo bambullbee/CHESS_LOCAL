@@ -9,33 +9,43 @@ const getDiversedResults = (): handler => {
     availableCells: [],
     frozenId: null,
     doesAttackKing: false,
+    towardsKing: { path: [], isCompletedPath: false },
   };
-  let wasEncounteredWithFigure: boolean = false;
   let prevCell: number;
   let shouldCheckForFrozen = true;
   let isObstacleOnWay = false;
   return (state, id, resultId, shouldReturn, shouldReset) => {
     if (shouldReset) {
-      wasEncounteredWithFigure = false;
       prevCell = null;
       isObstacleOnWay = false;
+      shouldCheckForFrozen = true;
+      if (res.frozenId || res.doesAttackKing) {
+        res.towardsKing.isCompletedPath = true;
+      }
+      if (!res.towardsKing.isCompletedPath) {
+        res.towardsKing.path = [];
+      }
       return;
     }
     if (shouldReturn) {
+      if (res.frozenId || res.doesAttackKing) {
+        res.towardsKing.isCompletedPath = true;
+      }
+      if (!res.towardsKing.isCompletedPath && !res.frozenId) {
+        res.towardsKing.path = [];
+      }
       return res;
     }
     res.range.push(resultId);
     if (
       state[resultId].figure === "king" &&
-      !wasEncounteredWithFigure &&
+      !isObstacleOnWay &&
       state[resultId].color !== state[id].color
     ) {
       res.doesAttackKing = true;
-      wasEncounteredWithFigure = true;
     }
     let isFigure = Boolean(state[resultId].figure);
     if (isFigure && shouldCheckForFrozen && !res.doesAttackKing) {
-      wasEncounteredWithFigure = true;
       if (prevCell) {
         if (
           state[resultId].figure === "king" &&
@@ -51,12 +61,15 @@ const getDiversedResults = (): handler => {
       }
     }
     if (!isObstacleOnWay) {
-      if (state[resultId].figure) {
+      if (isFigure) {
         res.availableCells.push(resultId);
         isObstacleOnWay = true;
       } else {
         res.availableCells.push(resultId);
       }
+    }
+    if (state[resultId].figure !== "king" && !res.towardsKing.isCompletedPath) {
+      res.towardsKing.path.push(resultId);
     }
   };
 };

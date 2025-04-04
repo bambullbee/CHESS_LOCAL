@@ -10,7 +10,7 @@ interface Cell {
     range: null | number[];
     //клетки, куда может походить, с учетом первого препятствия(bqr, пешки...?, для короля сразу указывать клетки не атакованные противником)
     availableCells: number[];
-    isFreezer: { is: boolean; target: number };
+    isFreezer: { is: boolean; target: number; pathTowardsKing: number[] };
   };
   attacked: {
     //проверка на isFrozen будет решать, можно ли фигурой ходить
@@ -35,22 +35,32 @@ interface initialStateI {
     white: { is: boolean; byWhom: number[] };
   };
   turn: FigureColor;
+  //нужно для обнуления этого шага при ходе любой фигуры
   pawnStep: {
     is: boolean;
     pawn: number;
     steppedField: number;
   };
+  kingId: { black: number; white: number };
 }
 
 interface Cells {
   [key: number]: Cell;
 }
 
-interface processedLongRangeAttackers {
+interface attackerBase {
   range?: number[];
   availableCells: number[];
   frozenId?: number;
   doesAttackKing: boolean;
+}
+
+interface attackingInfo extends attackerBase {
+  towardsKing?: number[];
+}
+
+interface processedLongRangeAttackers extends attackerBase {
+  towardsKing: { path: number[]; isCompletedPath: boolean };
 }
 
 type handler = (
@@ -67,4 +77,5 @@ export type {
   processedLongRangeAttackers,
   handler,
   initialStateI,
+  attackingInfo,
 };

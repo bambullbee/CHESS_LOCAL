@@ -3,9 +3,16 @@ import { memo, useEffect, useMemo, useState } from "react";
 import s from "./Cell.module.css";
 import useSelectorTs from "@/shared/withTypesHooks/useSelector";
 import {
+  Bishop,
   createSelectorTs,
   FigureColor,
+  figureIconColors,
   FigureType,
+  King,
+  Knight,
+  Pawn,
+  Queen,
+  Rook,
   useDispatchTs,
 } from "@/shared";
 import {
@@ -26,13 +33,13 @@ const Cell = ({ row, column, id }: CellP) => {
   const squareColor = useMemo(() => {
     if (row % 2 === 0) {
       if (column % 2 === 0) {
-        return "black";
-      } else return "white";
+        return "rgb(146, 168, 174)";
+      } else return "rgb(176, 202, 209)";
     } else {
       if (column % 2 === 0) {
-        return "white";
+        return "rgb(176, 202, 209)";
       } else {
-        return "black";
+        return "rgb(146, 168, 174)";
       }
     }
   }, []);
@@ -51,18 +58,45 @@ const Cell = ({ row, column, id }: CellP) => {
           }
           return false;
         },
+        (state) =>
+          state.board.cells[id].attacked.whoIsFieldUnderAttackBy.directly,
+        (state) => {
+          return state.board.cells[id].attacked.isFrozen;
+        },
+        (state) => state.board.cells[id].withPawnStep,
+        (state) => state.board.cells[id].attacked.isFrozen.byWhom,
       ],
-      (figure, color, isChosen, availableToBeSteped) => ({
+      (
         figure,
         color,
         isChosen,
         availableToBeSteped,
+        whoIsFieldUnderAttackBy,
+        isFrozen,
+        withPawnStep,
+        byWhom
+      ) => ({
+        figure,
+        color,
+        isChosen,
+        availableToBeSteped,
+        whoIsFieldUnderAttackBy,
+        isFrozen,
+        withPawnStep,
+        byWhom,
       })
     );
   }, []);
 
-  const { figure, color, isChosen, availableToBeSteped } =
-    useSelectorTs(selector);
+  const {
+    figure,
+    color,
+    isChosen,
+    availableToBeSteped,
+    isFrozen,
+    withPawnStep,
+    byWhom,
+  } = useSelectorTs(selector);
 
   const dispatch = useDispatchTs();
 
@@ -82,6 +116,43 @@ const Cell = ({ row, column, id }: CellP) => {
     }
   };
 
+  const cellFigure = useMemo(() => {
+    const getColors = (color: FigureColor): figureIconColors => {
+      if (color === "white") {
+        return {
+          firstColor: "#D5D5D5",
+          secondColor: "#FFFBFB",
+          thirdColor: "#FFFFFF",
+          borderColor: "#000000",
+        };
+      } else {
+        return {
+          firstColor: "#555555",
+          secondColor: "#424242",
+          thirdColor: "#000000",
+          borderColor: "#FFFFFF",
+        };
+      }
+    };
+    const res = getColors(color);
+    switch (figure) {
+      case "pawn":
+        return <Pawn {...res} />;
+      case "knight":
+        return <Knight {...res} />;
+      case "bishop":
+        return <Bishop {...res} />;
+      case "queen":
+        return <Queen {...res} />;
+      case "rook":
+        return <Rook {...res} />;
+      case "king":
+        return <King {...res} />;
+      default:
+        return "";
+    }
+  }, [figure, color]);
+
   return (
     <button
       className={s.cell}
@@ -95,7 +166,8 @@ const Cell = ({ row, column, id }: CellP) => {
       }}
       onClick={onClick}
     >
-      {id}, {figure}, {color}
+      {figure + " " + color}, isCh: {isChosen ? "tr" : "fa"}, isFr:
+      {isFrozen ? "tr" : "fa"}, byWh: {byWhom}
     </button>
   );
 };

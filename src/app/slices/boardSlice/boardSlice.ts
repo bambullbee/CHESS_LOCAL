@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import {
-  getAttackedCells,
-  getStartFigure,
   initialStateI,
   type Cell,
   type Cells,
@@ -21,7 +19,7 @@ const emptyCell: Cell = {
     doesAttackKing: false,
     range: [],
     availableCells: [],
-    isFreezer: { is: false, target: null },
+    isFreezer: { is: false, target: null, pathTowardsKing: [] },
   },
   attacked: {
     isFrozen: { is: false, byWhom: null },
@@ -47,7 +45,7 @@ for (let e = 0; e <= 7; e++) {
         doesAttackKing: false,
         range: [],
         availableCells: [],
-        isFreezer: { is: false, target: null },
+        isFreezer: { is: false, target: null, pathTowardsKing: [] },
       },
       attacked: {
         isFrozen: { is: false, byWhom: null },
@@ -75,6 +73,10 @@ const initialState: initialStateI = {
     pawn: null,
     steppedField: null,
   },
+  kingId: {
+    black: null,
+    white: null,
+  },
 };
 
 const boardSlice = createSlice({
@@ -94,23 +96,20 @@ const boardSlice = createSlice({
       cellInfoHandler(state, id, shouldInitialize, selfCreate);
     },
     getAttackingInfo: (state, { payload }) => {
-      attackingInfoHandler(state, payload);
+      return attackingInfoHandler(state, payload);
     },
-    moveFigure: (state, { payload }: PayloadAction<number>) => {
-      if (state.pawnStep.steppedField) {
-        state.cells[state.pawnStep.steppedField].withPawnStep = false;
-      }
-      state.pawnStep = {
-        is: false,
-        pawn: null,
-        steppedField: null,
-      };
-      const cells = state.cells;
-      const cc = cells[state.chosenCell];
-      if (
-        cc.color !== cells[payload].color &&
-        !cells[payload].attacked.isFrozen.is
-      ) {
+    moveFigure: (proxyState, { payload }: PayloadAction<number>) => {
+      let state = JSON.parse(
+        JSON.stringify(proxyState)
+      ) as unknown as initialStateI;
+
+      const cc = JSON.parse(
+        JSON.stringify(state.cells[state.chosenCell])
+      ) as Cell;
+
+      const defenseSide: FigureColor = cc.color === "black" ? "white" : "black";
+
+      if (cc.color !== state.cells[payload].color) {
         if (state.check[state.turn].is) {
           if (
             state.check[state.turn].byWhom.length > 1 &&
@@ -118,61 +117,177 @@ const boardSlice = createSlice({
           ) {
             return state;
           }
-          if (cc.figure !== "king") {
+          if (
+            cc.figure !== "king" &&
+            !state.cells[
+              state.check[state.turn].byWhom[0]
+            ].attacks.availableCells.includes(payload)
+          ) {
             return state;
           }
         }
+        if (state.cells[state.chosenCell].attacked.isFrozen.is) {
+          if (
+            !state.cells[
+              state.cells[state.chosenCell].attacked.isFrozen.byWhom
+            ].attacks.isFreezer.pathTowardsKing.includes(payload) &&
+            state.cells[state.chosenCell].attacked.isFrozen.byWhom !== payload
+          ) {
+            return state;
+          }
+        }
+        if (cc.figure === "pawn") {
+          if ((state.chosenCell - payload) % 8 !== 0) {
+            if (
+              !Boolean(state.cells[payload].figure) &&
+              !Boolean(state.cells[payload].withPawnStep)
+            ) {
+              return state;
+            }
+          }
+        }
+
+        if (state.pawnStep.steppedField) {
+          state.cells[state.pawnStep.steppedField].withPawnStep = false;
+        }
+        state.pawnStep = {
+          is: false,
+          pawn: null,
+          steppedField: null,
+        };
         if (
           cc.figure === "pawn" &&
           Math.abs(state.chosenCell - payload) === 16
         ) {
           const sign = (payload - state.chosenCell) / 16;
-          cells[state.chosenCell + 8 * sign].withPawnStep = true;
+          state.cells[state.chosenCell + 8 * sign].withPawnStep = true;
           state.pawnStep = {
             is: true,
             pawn: payload,
             steppedField: state.chosenCell + 8 * sign,
           };
-          if (cells[state.chosenCell + 16 * sign - 1].figure) {
-            attackingInfoHandler(state, state.chosenCell + 16 * sign - 1);
+
+          if (state.cells[state.chosenCell + 16 * sign - 1].figure) {
+            state = attackingInfoHandler(
+              state,
+              state.chosenCell + 16 * sign - 1
+            );
           }
 
-          if (cells[state.chosenCell + 16 * sign + 1].figure) {
-            attackingInfoHandler(state, state.chosenCell + 16 * sign + 1);
+          if (state.cells[state.chosenCell + 16 * sign + 1].figure) {
+            state = attackingInfoHandler(
+              state,
+              state.chosenCell + 16 * sign + 1
+            );
           }
         }
-        cells[payload].figure = cc.figure;
-        cells[payload].color = cc.color;
+        const currCellDirectly = [
+          ...state.cells[payload].attacked.whoIsFieldUnderAttackBy.directly,
+        ];
+        const currCellThrough = [
+          ...state.cells[payload].attacked.whoIsFieldUnderAttackBy.through,
+        ];
+        state.cells[payload].figure = cc.figure;
+        state.cells[payload].color = cc.color;
         const freezer = cc.attacks.isFreezer;
         if (freezer.is) {
-          cells[freezer.target].attacked.isFrozen = {
+          state.cells[freezer.target].attacked.isFrozen = {
             is: false,
             byWhom: null,
           };
         }
         if (cc.attacks.doesAttackKing) {
-          const defenseSide =
-            state.check[cc.color === "black" ? "white" : "black"];
-          defenseSide.byWhom = defenseSide.byWhom.filter(
-            (id) => id !== payload
-          );
-          if (defenseSide.byWhom.length === 0) {
-            defenseSide.is = false;
+          state.check[defenseSide].byWhom = state.check[
+            defenseSide
+          ].byWhom.filter((id: number) => id !== payload);
+          if (state.check[defenseSide].byWhom.length === 0) {
+            state.check[defenseSide].is = false;
           }
         }
-        const prevCellDirectly = cc.attacked.whoIsFieldUnderAttackBy.directly;
-        const currCellDirectly =
-          cells[payload].attacked.whoIsFieldUnderAttackBy.directly;
-        cells[state.chosenCell] = emptyCell;
-        attackingInfoHandler(state, payload);
-        prevCellDirectly.forEach((id) => {
-          attackingInfoHandler(state, id);
+
+        state.cells[state.chosenCell].attacks.availableCells.forEach((id) => {
+          state.cells[id].attacked.whoIsFieldUnderAttackBy.directly.splice(
+            state.cells[id].attacked.whoIsFieldUnderAttackBy.directly.findIndex(
+              (el) => {
+                return el === state.chosenCell;
+              }
+            ),
+            1
+          );
         });
-        currCellDirectly.forEach((id) => {
-          attackingInfoHandler(state, id);
+        state.cells[state.chosenCell].attacks.range.forEach((id) => {
+          state.cells[id].attacked.whoIsFieldUnderAttackBy.through.splice(
+            state.cells[id].attacked.whoIsFieldUnderAttackBy.through.findIndex(
+              (el) => {
+                return el === state.chosenCell;
+              }
+            ),
+            1
+          );
+        });
+
+        if (state.cells[payload].figure) {
+          state.check[state.cells[state.chosenCell].color].byWhom = state.check[
+            state.cells[state.chosenCell].color
+          ].byWhom.filter((id) => id !== payload);
+          if (
+            state.check[state.cells[state.chosenCell].color].byWhom.length === 0
+          ) {
+            state.check[state.cells[state.chosenCell].color].is = false;
+          }
+        }
+        state.cells[state.chosenCell] = emptyCell;
+        state = attackingInfoHandler(state, payload);
+        cc.attacked.whoIsFieldUnderAttackBy.directly.forEach((id: number) => {
+          state = attackingInfoHandler(state, id);
+        });
+        currCellDirectly.forEach((id: number) => {
+          state = attackingInfoHandler(state, id);
         });
         state.turn = state.turn === "white" ? "black" : "white";
       }
+      if (
+        cc.figure === "king" &&
+        state.cells[payload].attacked.whoIsFieldUnderAttackBy.through.length > 0
+      ) {
+        state.cells[payload].attacked.whoIsFieldUnderAttackBy.through.forEach(
+          (attackerId) => {
+            if (state.cells[attackerId].color !== cc.color) {
+              state = attackingInfoHandler(state, attackerId);
+            }
+          }
+        );
+      }
+      if (state.check[defenseSide].is) {
+        if (state.check[defenseSide].byWhom.length > 1) {
+          if (
+            state.cells[state.kingId[defenseSide]].attacks.availableCells
+              .length === 0
+          ) {
+            state.turn = null;
+          }
+        } else {
+          if (
+            state.cells[state.kingId[defenseSide]].attacks.availableCells
+              .length === 0 &&
+            [
+              state.check[defenseSide].byWhom[0],
+              ...state.cells[state.check[defenseSide].byWhom[0]].attacks
+                .isFreezer.pathTowardsKing,
+            ].some((id) => {
+              return state.cells[
+                id
+              ].attacked.whoIsFieldUnderAttackBy.directly.some(
+                (potentialAllyId) =>
+                  state.cells[potentialAllyId].color === defenseSide
+              );
+            })
+          ) {
+            state.turn = null;
+          }
+        }
+      }
+      return state;
     },
     changeChosenCell: (state, { payload }) => {
       if (Boolean(payload)) {
@@ -187,7 +302,9 @@ const boardSlice = createSlice({
             state.chosenCell = payload;
           }
         } else if (state.cells[payload].color === state.turn) {
+          state = attackingInfoHandler(state, payload);
           state.chosenCell = payload;
+          return state;
         }
       } else {
         state.chosenCell = null;

@@ -17,7 +17,7 @@ const isNumberInRange = (start: number, end: number) => {
   };
 };
 
-const isOnBoard = isNumberInRange(0, 64);
+const isOnBoard = isNumberInRange(0, 65);
 
 const rangeToCheck = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -28,7 +28,7 @@ const bqrLogic = (
   handler: handler
 ): processedLongRangeAttackers => {
   signsToCheck.forEach((signs) => {
-    handler(state, 0, 0, false, true);
+    handler(state, id, 0, false, true);
     rangeToCheck.forEach((r) => {
       const sameColDiffRow = id + signs[0] * r * 8;
       const resultId = sameColDiffRow + signs[1] * r;

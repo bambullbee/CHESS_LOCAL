@@ -26,6 +26,9 @@ const cellInfoHandler = (
   }
   cell.figure = startFigure;
   cell.color = color;
+  if (state.cells[id].figure === "king") {
+    state.kingId[state.cells[id].color] = id;
+  }
 };
 
 export default cellInfoHandler;

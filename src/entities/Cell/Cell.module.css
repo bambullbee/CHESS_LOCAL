@@ -3,6 +3,10 @@
   flex-shrink: 0;
   width: 60px;
   height: 60px;
+  padding: 5px;
 
+  color: rgb(176, 202, 209);
   font-size: 8px;
+
+  box-sizing: border-box;
 }
