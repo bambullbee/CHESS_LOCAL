@@ -71,6 +71,9 @@ const getDiversedResults = (): handler => {
     if (state[resultId].figure !== "king" && !res.towardsKing.isCompletedPath) {
       res.towardsKing.path.push(resultId);
     }
+    if (res.doesAttackKing) {
+      res.availableCells.push(resultId);
+    }
   };
 };
 

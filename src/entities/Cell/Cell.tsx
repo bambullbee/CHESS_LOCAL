@@ -29,7 +29,7 @@ interface CellP {
 }
 
 const Cell = ({ row, column, id }: CellP) => {
-  const shouldShowInfo = true;
+  const shouldShowInfo = false;
   //заменить хардкод цветов на получение цветов из стора-тема
   const squareColor = useMemo(() => {
     if (row % 2 === 0) {
@@ -163,7 +163,7 @@ const Cell = ({ row, column, id }: CellP) => {
           : availableToBeSteped
           ? "yellow"
           : squareColor,
-        color: figure ? "red" : "black",
+        color: figure ? (color === "white" ? "white" : "black") : "pink",
       }}
       onClick={onClick}
     >

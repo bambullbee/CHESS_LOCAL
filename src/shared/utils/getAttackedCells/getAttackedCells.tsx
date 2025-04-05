@@ -234,37 +234,41 @@ const getAttackedCells = ({
           if (isOnBoard(firstSummand + id)) {
             if (isCellTheSameRow(id, id + secondSummand)) {
               if (
-                !state.cells[
+                state.cells[
                   resultId
-                ].attacked.whoIsFieldUnderAttackBy.attackerColor.includes(
-                  potentialAttackerColor
+                ].attacked.whoIsFieldUnderAttackBy.directly.every(
+                  (attackerId) => {
+                    return (
+                      state.cells[attackerId].color !== potentialAttackerColor
+                    );
+                  }
                 )
               ) {
                 return resultId;
               }
-              if (
-                state.cells[resultId].color === potentialAttackerColor &&
-                state.cells[resultId].figure
-              ) {
-                if (
-                  state.cells[
-                    resultId
-                  ].attacked.whoIsFieldUnderAttackBy.directly.every(
-                    (attackerId) => {
-                      if (attackerId !== resultId) {
-                        return (
-                          state.cells[attackerId].color !==
-                          potentialAttackerColor
-                        );
-                      } else {
-                        return true;
-                      }
-                    }
-                  )
-                ) {
-                  return resultId;
-                }
-              }
+              // if (
+              //   state.cells[resultId].color === potentialAttackerColor &&
+              //   state.cells[resultId].figure
+              // ) {
+              //   if (
+              //     state.cells[
+              //       resultId
+              //     ].attacked.whoIsFieldUnderAttackBy.directly.every(
+              //       (attackerId) => {
+              //         if (attackerId !== resultId) {
+              //           return (
+              //             state.cells[attackerId].color !==
+              //             potentialAttackerColor
+              //           );
+              //         } else {
+              //           return true;
+              //         }
+              //       }
+              //     )
+              //   ) {
+              //     return resultId;
+              //   }
+              // }
             }
           }
         })

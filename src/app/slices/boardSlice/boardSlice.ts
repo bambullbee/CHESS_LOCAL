@@ -108,20 +108,24 @@ const boardSlice = createSlice({
       ) as Cell;
 
       const defenseSide: FigureColor = cc.color === "black" ? "white" : "black";
-
+      //если бьет союзную фигуру, то вычисление хода не происходит
       if (cc.color !== state.cells[payload].color) {
+        //если шах тому, кто ходит...
         if (state.check[state.turn].is) {
+          //если двойной шах, то ходить может только король
           if (
             state.check[state.turn].byWhom.length > 1 &&
             cc.figure !== "king"
           ) {
             return state;
           }
+          //ходит не король при шахе, но ходом фигура не прикрывает короля
           if (
             cc.figure !== "king" &&
             !state.cells[
               state.check[state.turn].byWhom[0]
-            ].attacks.availableCells.includes(payload)
+            ].attacks.isFreezer.pathTowardsKing.includes(payload) &&
+            state.check[state.turn].byWhom[0] !== payload
           ) {
             return state;
           }
@@ -219,24 +223,30 @@ const boardSlice = createSlice({
         }
 
         state.cells[state.chosenCell].attacks.availableCells.forEach((id) => {
-          state.cells[id].attacked.whoIsFieldUnderAttackBy.directly.splice(
-            state.cells[id].attacked.whoIsFieldUnderAttackBy.directly.findIndex(
-              (el) => {
-                return el === state.chosenCell;
-              }
-            ),
-            1
-          );
+          const index = state.cells[
+            id
+          ].attacked.whoIsFieldUnderAttackBy.directly.findIndex((el) => {
+            return el === state.chosenCell;
+          });
+          if (index > -1) {
+            state.cells[id].attacked.whoIsFieldUnderAttackBy.directly.splice(
+              index,
+              1
+            );
+          }
         });
         state.cells[state.chosenCell].attacks.range.forEach((id) => {
-          state.cells[id].attacked.whoIsFieldUnderAttackBy.through.splice(
-            state.cells[id].attacked.whoIsFieldUnderAttackBy.through.findIndex(
-              (el) => {
-                return el === state.chosenCell;
-              }
-            ),
-            1
-          );
+          const index = state.cells[
+            id
+          ].attacked.whoIsFieldUnderAttackBy.through.findIndex((el) => {
+            return el === state.chosenCell;
+          });
+          if (index > -1) {
+            state.cells[id].attacked.whoIsFieldUnderAttackBy.through.splice(
+              index,
+              1
+            );
+          }
         });
 
         if (state.cells[payload].figure) {
@@ -249,14 +259,40 @@ const boardSlice = createSlice({
             state.check[state.cells[state.chosenCell].color].is = false;
           }
         }
+
+        state.cells[state.chosenCell].attacks.range.forEach((cellId) => {
+          const index = state.cells[
+            cellId
+          ].attacked.whoIsFieldUnderAttackBy.through.findIndex(
+            (el) => el === state.chosenCell
+          );
+          if (index > -1) {
+            state.cells[cellId].attacked.whoIsFieldUnderAttackBy.through.splice(
+              index,
+              1
+            );
+          }
+        });
+        state.cells[payload].attacks.availableCells.forEach((id: number) => {
+          const index = state.cells[
+            id
+          ].attacked.whoIsFieldUnderAttackBy.directly.findIndex(
+            (el) => el === payload
+          );
+          if (index > -1) {
+            state.cells[id].attacked.whoIsFieldUnderAttackBy.directly.splice(
+              index,
+              1
+            );
+          }
+          state = attackingInfoHandler(state, id);
+        });
         state.cells[state.chosenCell] = emptyCell;
         state = attackingInfoHandler(state, payload);
         cc.attacked.whoIsFieldUnderAttackBy.directly.forEach((id: number) => {
           state = attackingInfoHandler(state, id);
         });
-        currCellDirectly.forEach((id: number) => {
-          state = attackingInfoHandler(state, id);
-        });
+
         state.turn = state.turn === "white" ? "black" : "white";
         if (cc.figure === "king") {
           state.cells[payload].attacked.whoIsFieldUnderAttackBy.through.forEach(
@@ -276,32 +312,47 @@ const boardSlice = createSlice({
       }
 
       if (state.check[defenseSide].is) {
-        if (state.check[defenseSide].byWhom.length > 1) {
-          if (
-            state.cells[state.kingId[defenseSide]].attacks.availableCells
-              .length === 0
-          ) {
-            state.turn = null;
-          }
-        } else {
-          if (
-            state.cells[state.kingId[defenseSide]].attacks.availableCells
-              .length === 0 &&
-            [
-              state.check[defenseSide].byWhom[0],
-              ...state.cells[state.check[defenseSide].byWhom[0]].attacks
-                .isFreezer.pathTowardsKing,
-            ].some((id) => {
-              return state.cells[
-                id
-              ].attacked.whoIsFieldUnderAttackBy.directly.some(
-                (potentialAllyId) =>
-                  state.cells[potentialAllyId].color === defenseSide
+        const availableCells = [
+          ...state.cells[state.kingId[defenseSide]].attacks.availableCells,
+        ].filter(
+          (id) =>
+            state.cells[id].color !== defenseSide &&
+            id !== state.kingId[defenseSide]
+        );
+        //checked
+        const isEveryCellAttacked = availableCells.every((cellId) => {
+          return state.cells[
+            cellId
+          ].attacked.whoIsFieldUnderAttackBy.directly.some(
+            (potentialAttackerId) => {
+              return (
+                state.cells[potentialAttackerId].color ===
+                state.cells[payload].color
               );
-            })
-          ) {
+            }
+          );
+        });
+        console.log(isEveryCellAttacked, availableCells);
+        if (state.check[defenseSide].byWhom.length > 1) {
+          if (isEveryCellAttacked) {
             state.turn = null;
           }
+        } else if (
+          isEveryCellAttacked &&
+          [
+            state.check[defenseSide].byWhom[0],
+            ...state.cells[state.check[defenseSide].byWhom[0]].attacks.isFreezer
+              .pathTowardsKing,
+          ].some((id) => {
+            return state.cells[
+              id
+            ].attacked.whoIsFieldUnderAttackBy.directly.some(
+              (potentialAllyId) =>
+                state.cells[potentialAllyId].color === defenseSide
+            );
+          })
+        ) {
+          state.turn = null;
         }
       }
       return state;
