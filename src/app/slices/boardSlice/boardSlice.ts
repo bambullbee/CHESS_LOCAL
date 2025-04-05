@@ -30,6 +30,7 @@ const emptyCell: Cell = {
     },
   },
   withPawnStep: false,
+  wasTouched: false,
 };
 
 // инициализация доски
@@ -56,6 +57,7 @@ for (let e = 0; e <= 7; e++) {
         },
       },
       withPawnStep: false,
+      wasTouched: false,
     };
   }
 }
@@ -107,6 +109,8 @@ const boardSlice = createSlice({
         JSON.stringify(state.cells[state.chosenCell])
       ) as Cell;
 
+      const chosenCellId = state.chosenCell;
+
       const defenseSide: FigureColor = cc.color === "black" ? "white" : "black";
       //если бьет союзную фигуру, то вычисление хода не происходит
       if (cc.color !== state.cells[payload].color) {
@@ -152,7 +156,10 @@ const boardSlice = createSlice({
               const pawnCell = JSON.parse(
                 JSON.stringify(state.cells[state.pawnStep.pawn])
               ) as unknown as Cell;
-              state.cells[state.pawnStep.pawn] = emptyCell;
+              state.cells[state.pawnStep.pawn] = {
+                ...emptyCell,
+                wasTouched: true,
+              };
               pawnCell.attacked.whoIsFieldUnderAttackBy.through.forEach(
                 (attackerId) => {
                   if (
@@ -201,9 +208,30 @@ const boardSlice = createSlice({
             );
           }
         }
-        const currCellDirectly = [
-          ...state.cells[payload].attacked.whoIsFieldUnderAttackBy.directly,
-        ];
+        if (
+          state.cells[state.chosenCell].figure === "king" &&
+          Math.abs(payload - state.chosenCell) === 2
+        ) {
+          const sign =
+            (state.chosenCell - payload) / Math.abs(state.chosenCell - payload);
+          state.cells[payload + sign].figure = "rook";
+          state.cells[payload + sign].color =
+            state.cells[state.chosenCell].color;
+          console.log("sign", sign);
+          state = attackingInfoHandler(state, payload + sign);
+          if (sign > 0) {
+            state.cells[state.chosenCell - 3] = {
+              ...emptyCell,
+              wasTouched: true,
+            };
+          }
+          if (sign < 0) {
+            state.cells[state.chosenCell + 4] = {
+              ...emptyCell,
+              wasTouched: true,
+            };
+          }
+        }
         state.cells[payload].figure = cc.figure;
         state.cells[payload].color = cc.color;
         const freezer = cc.attacks.isFreezer;
@@ -287,7 +315,7 @@ const boardSlice = createSlice({
           }
           state = attackingInfoHandler(state, id);
         });
-        state.cells[state.chosenCell] = emptyCell;
+        state.cells[state.chosenCell] = { ...emptyCell, wasTouched: true };
         state = attackingInfoHandler(state, payload);
         cc.attacked.whoIsFieldUnderAttackBy.directly.forEach((id: number) => {
           state = attackingInfoHandler(state, id);
@@ -319,7 +347,6 @@ const boardSlice = createSlice({
             state.cells[id].color !== defenseSide &&
             id !== state.kingId[defenseSide]
         );
-        //checked
         const isEveryCellAttacked = availableCells.every((cellId) => {
           return state.cells[
             cellId
@@ -332,7 +359,6 @@ const boardSlice = createSlice({
             }
           );
         });
-        console.log(isEveryCellAttacked, availableCells);
         if (state.check[defenseSide].byWhom.length > 1) {
           if (isEveryCellAttacked) {
             state.turn = null;
@@ -355,6 +381,7 @@ const boardSlice = createSlice({
           state.turn = null;
         }
       }
+      state.cells[payload].wasTouched = true;
       return state;
     },
     changeChosenCell: (state, { payload }) => {

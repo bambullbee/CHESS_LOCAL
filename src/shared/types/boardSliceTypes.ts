@@ -25,6 +25,7 @@ interface Cell {
     };
   };
   withPawnStep: boolean;
+  wasTouched: boolean;
 }
 
 interface initialStateI {

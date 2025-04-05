@@ -224,13 +224,13 @@ const getAttackedCells = ({
           [],
       };
     case "king":
+      const potentialAttackerColor =
+        state.cells[id].color === "black" ? "white" : "black";
       res.availableCells = extendedSignsToCheck
         .map((signs: [number, number]) => {
           const firstSummand = signs[0] * 8;
           const secondSummand = signs[1] * 1;
           const resultId = id + firstSummand + secondSummand;
-          const potentialAttackerColor =
-            state.cells[id].color === "black" ? "white" : "black";
           if (isOnBoard(firstSummand + id)) {
             if (isCellTheSameRow(id, id + secondSummand)) {
               if (
@@ -246,33 +246,51 @@ const getAttackedCells = ({
               ) {
                 return resultId;
               }
-              // if (
-              //   state.cells[resultId].color === potentialAttackerColor &&
-              //   state.cells[resultId].figure
-              // ) {
-              //   if (
-              //     state.cells[
-              //       resultId
-              //     ].attacked.whoIsFieldUnderAttackBy.directly.every(
-              //       (attackerId) => {
-              //         if (attackerId !== resultId) {
-              //           return (
-              //             state.cells[attackerId].color !==
-              //             potentialAttackerColor
-              //           );
-              //         } else {
-              //           return true;
-              //         }
-              //       }
-              //     )
-              //   ) {
-              //     return resultId;
-              //   }
-              // }
             }
           }
         })
         .filter((id) => id !== 0);
+
+      if (!state.cells[id].wasTouched) {
+        const rooks = [id - 3, id + 4];
+        const resRooks = rooks.filter((rookId) => {
+          const rookIsReady =
+            state.cells[rookId].figure === "rook" &&
+            state.cells[rookId].color === state.cells[id].color &&
+            !state.cells[rookId].wasTouched;
+          let cellsToCheck: number[] = [];
+          let shouldCheck: boolean = true;
+          let sign = (id - rookId) / Math.abs(id - rookId);
+          for (let i = 1; i !== Math.abs(id - rookId); i++) {
+            if (shouldCheck) {
+              const cell = state.cells[rookId + sign * i];
+              if (
+                !cell.figure &&
+                cell.attacked.whoIsFieldUnderAttackBy.directly.every(
+                  (betweenId) => {
+                    return !state.cells[
+                      betweenId
+                    ].attacked.whoIsFieldUnderAttackBy.directly.some(
+                      (attacker) => {
+                        state.cells[attacker].color === potentialAttackerColor;
+                      }
+                    );
+                  }
+                )
+              ) {
+                cellsToCheck.push(rookId + sign * i);
+              } else {
+                shouldCheck = false;
+                break;
+              }
+            }
+          }
+          return rookIsReady && shouldCheck;
+        });
+        resRooks.forEach((rookId) => {
+          res.availableCells.push(rookId > id ? id + 2 : id - 2);
+        });
+      }
       return res;
   }
 };
