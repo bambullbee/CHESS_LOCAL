@@ -267,17 +267,11 @@ const getAttackedCells = ({
               if (
                 !cell.figure &&
                 cell.attacked.whoIsFieldUnderAttackBy.directly.every(
-                  (betweenId) => {
-                    return !state.cells[
-                      betweenId
-                    ].attacked.whoIsFieldUnderAttackBy.directly.some(
-                      (attacker) => {
-                        state.cells[attacker].color === potentialAttackerColor;
-                      }
-                    );
-                  }
+                  (attacker) =>
+                    state.cells[attacker].color !== potentialAttackerColor
                 )
               ) {
+                console.log(rookId, rookId + sign * i);
                 cellsToCheck.push(rookId + sign * i);
               } else {
                 shouldCheck = false;

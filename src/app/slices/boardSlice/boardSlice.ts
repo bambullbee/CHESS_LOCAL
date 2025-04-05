@@ -112,6 +112,9 @@ const boardSlice = createSlice({
       const chosenCellId = state.chosenCell;
 
       const defenseSide: FigureColor = cc.color === "black" ? "white" : "black";
+      if (payload === state.chosenCell) {
+        return state;
+      }
       //если бьет союзную фигуру, то вычисление хода не происходит
       if (cc.color !== state.cells[payload].color) {
         //если шах тому, кто ходит...
@@ -217,7 +220,6 @@ const boardSlice = createSlice({
           state.cells[payload + sign].figure = "rook";
           state.cells[payload + sign].color =
             state.cells[state.chosenCell].color;
-          console.log("sign", sign);
           state = attackingInfoHandler(state, payload + sign);
           if (sign > 0) {
             state.cells[state.chosenCell - 3] = {
@@ -381,7 +383,7 @@ const boardSlice = createSlice({
           state.turn = null;
         }
       }
-      state.cells[payload].wasTouched = true;
+
       return state;
     },
     changeChosenCell: (state, { payload }) => {
