@@ -234,19 +234,7 @@ const getAttackedCells = ({
           const resultId = id + firstSummand + secondSummand;
           if (isOnBoard(firstSummand + id)) {
             if (isCellTheSameRow(id, id + secondSummand)) {
-              if (
-                state.cells[
-                  resultId
-                ].attacked.whoIsFieldUnderAttackBy.directly.every(
-                  (attackerId: number) => {
-                    return (
-                      state.cells[attackerId].color !== potentialAttackerColor
-                    );
-                  }
-                )
-              ) {
-                return resultId;
-              }
+              return resultId;
             }
           }
         })

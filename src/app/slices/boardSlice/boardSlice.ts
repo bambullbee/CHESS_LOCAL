@@ -172,6 +172,18 @@ const boardSlice = createSlice({
           }
         }
       }
+      //король не может ходить на аткованные поля
+      if (cc.figure === "king") {
+        if (
+          [...payloadCell.attacked.whoIsFieldUnderAttackBy.directly]
+            .filter((id) => id !== payload)
+            .some((potentialAttackerId) => {
+              return state.cells[potentialAttackerId].color === defenseSide;
+            })
+        ) {
+          return state;
+        }
+      }
       //каждый ход сбрасывать pawnStep
       if (state.pawnStep.steppedField) {
         state.cells[state.pawnStep.steppedField].withPawnStep = false;
@@ -288,32 +300,42 @@ const boardSlice = createSlice({
       }
       //даем ход другой стороне
       state.turn = state.turn === "white" ? "black" : "white";
-      //!!но также проверяем, не мат ли
+      //но также проверяем, не мат ли
       if (state.check[defenseSide].is) {
         const kingId = state.kingId[defenseSide];
+        //клетки без союзных фигур
         const availableCells = [
           ...state.cells[kingId].attacks.availableCells,
-        ].filter(
-          (id) => state.cells[id].color !== defenseSide && id !== kingId
-        );
+        ].filter((id) => {
+          return state.cells[id].color !== defenseSide && id !== kingId;
+        });
+        //атакованы ли они врагом
         const isEveryCellAttacked = availableCells.every((cellId) => {
-          return state.cells[
-            cellId
-          ].attacked.whoIsFieldUnderAttackBy.directly.some(
-            (potentialAttackerId) => {
+          return [
+            ...state.cells[cellId].attacked.whoIsFieldUnderAttackBy.directly,
+          ]
+            .filter((id) => {
+              if (cellId === id) {
+                return id !== payload;
+              } else {
+                return true;
+              }
+            })
+            .some((potentialAttackerId) => {
               return (
                 state.cells[potentialAttackerId].color === payloadCell.color
               );
-            }
-          );
+            });
         });
+        //если двойной шах, то учитывается только то, может ли ходить король
         if (state.check[defenseSide].byWhom.length > 1) {
           if (isEveryCellAttacked) {
             state.turn = null;
           }
+          //иначе учитывается еще возможность союзных фигур прикрыть короля
         } else if (
           isEveryCellAttacked &&
-          [
+          ![
             state.check[defenseSide].byWhom[0],
             ...state.cells[state.check[defenseSide].byWhom[0]].attacks
               .pathTowardsKing,
@@ -322,7 +344,8 @@ const boardSlice = createSlice({
               id
             ].attacked.whoIsFieldUnderAttackBy.directly.some(
               (potentialAllyId) =>
-                state.cells[potentialAllyId].color === defenseSide
+                state.cells[potentialAllyId].color === defenseSide &&
+                potentialAllyId !== state.kingId[defenseSide]
             );
           })
         ) {

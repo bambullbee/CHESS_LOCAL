@@ -7,9 +7,6 @@ import {
 
 const attackingInfoHandler = (state: initialStateI, payload: number) => {
   let attackingInfo: attackingInfo;
-  // const state = JSON.parse(
-  //   JSON.stringify(proxyState)
-  // ) as unknown as initialStateI;
   const payloadCell = state.cells[payload];
   const prevFrozenId = payloadCell.attacks.isFreezer.target;
 
