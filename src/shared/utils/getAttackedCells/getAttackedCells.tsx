@@ -66,8 +66,9 @@ const getAttackedCells = ({
   figure,
   id,
   side,
-  state,
+  state: proxyState,
 }: strictProps): attackingInfo => {
+  const state = JSON.parse(JSON.stringify(proxyState));
   let plusOrMinus;
   if (side === 1) {
     plusOrMinus = 1;
@@ -237,7 +238,7 @@ const getAttackedCells = ({
                 state.cells[
                   resultId
                 ].attacked.whoIsFieldUnderAttackBy.directly.every(
-                  (attackerId) => {
+                  (attackerId: number) => {
                     return (
                       state.cells[attackerId].color !== potentialAttackerColor
                     );
@@ -267,7 +268,7 @@ const getAttackedCells = ({
               if (
                 !cell.figure &&
                 cell.attacked.whoIsFieldUnderAttackBy.directly.every(
-                  (attacker) =>
+                  (attacker: number) =>
                     state.cells[attacker].color !== potentialAttackerColor
                 )
               ) {

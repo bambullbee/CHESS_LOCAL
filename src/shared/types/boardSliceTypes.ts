@@ -4,24 +4,23 @@ interface Cell {
   figure: FigureType;
   color: "black" | "white" | null;
   attacks: {
-    //если да, то меняем стейт у соответствующего цвета state.black || state.white
     doesAttackKing: boolean;
-    //прострел для bqr. проверять
+    //клетки, на которые могла бы походить bqr bishop queen rook через преграждающие фигуры
     range: null | number[];
-    //клетки, куда может походить, с учетом первого препятствия(bqr, пешки...?, для короля сразу указывать клетки не атакованные противником)
+    //клетки, куда фигура может походить
     availableCells: number[];
-    isFreezer: { is: boolean; target: number; pathTowardsKing: number[] };
+    //связывает ли bqr фигуру(за фигурой стоит король)
+    isFreezer: { is: boolean; target: number };
+    pathTowardsKing: number[];
   };
   attacked: {
-    //проверка на isFrozen будет решать, можно ли фигурой ходить
+    //связана ли фигура
     isFrozen: { is: boolean; byWhom: number };
     whoIsFieldUnderAttackBy: {
-      //надо для гайд-версии. если массив не пустой, то король туда не может ходить. при проверке достаем айди из этого массива и cells[id].attacks.range перепроверяем
+      //кем атакованы клетки. вычисляется но основе availableCells
       directly: number[];
-      //пока что не нахожу применения этой штуке, но можно использовать для эффектов, как на личес
+      //кем атакованы клетки прострелом. вычисляется но основе range
       through: number[];
-      //необходимо для проверки этих тиммейтов после того, как сама фигура подвинется. необходимо добавлять сюда только bqr, так как только их атаки могут меняться после продвижения фигуры
-      attackerColor: FigureColor[];
     };
   };
   withPawnStep: boolean;
@@ -36,7 +35,7 @@ interface initialStateI {
     white: { is: boolean; byWhom: number[] };
   };
   turn: FigureColor;
-  //нужно для обнуления этого шага при ходе любой фигуры
+  //шаг пешки на два поля вперед
   pawnStep: {
     is: boolean;
     pawn: number;
