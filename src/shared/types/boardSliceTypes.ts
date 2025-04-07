@@ -27,6 +27,12 @@ interface Cell {
   wasTouched: boolean;
 }
 
+interface pawnStepI {
+  is: boolean;
+  pawn: number;
+  steppedField: number;
+}
+
 interface initialStateI {
   cells: Cells;
   chosenCell: number | null;
@@ -36,11 +42,7 @@ interface initialStateI {
   };
   turn: FigureColor;
   //шаг пешки на два поля вперед
-  pawnStep: {
-    is: boolean;
-    pawn: number;
-    steppedField: number;
-  };
+  pawnStep: pawnStepI;
   kingId: { black: number; white: number };
 }
 
@@ -71,6 +73,11 @@ type handler = (
   shouldReset?: boolean
 ) => processedLongRangeAttackers;
 
+interface baseCellInfo {
+  figure: FigureType;
+  colour: FigureColor;
+}
+
 export type {
   Cell,
   Cells,
@@ -78,4 +85,6 @@ export type {
   handler,
   initialStateI,
   attackingInfo,
+  baseCellInfo,
+  pawnStepI,
 };

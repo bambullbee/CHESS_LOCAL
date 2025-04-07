@@ -21,14 +21,17 @@ import {
   getCellNewInfo,
   moveFigure,
 } from "@/app";
+import { current } from "@reduxjs/toolkit";
 
 interface CellP {
   row: number;
   column: number;
   id: number;
+  figure: FigureType;
+  colour: FigureColor;
 }
 
-const Cell = ({ row, column, id }: CellP) => {
+const Cell = ({ row, column, id, colour, figure }: CellP) => {
   const shouldShowInfo = false;
   //заменить хардкод цветов на получение цветов из стора-тема
   const squareColor = useMemo(() => {
@@ -59,50 +62,23 @@ const Cell = ({ row, column, id }: CellP) => {
           }
           return false;
         },
-        (state) => state.board.cells[id].attacked.whoIsFieldUnderAttackBy,
-        (state) => {
-          return state.board.cells[id].attacked.isFrozen.is;
-        },
-        (state) => state.board.cells[id].withPawnStep,
-        (state) => state.board.cells[id].attacked.isFrozen.byWhom,
       ],
-      (
-        figure,
+      (figure, color, isChosen, availableToBeSteped) => ({
+        currentFigure: figure,
         color,
         isChosen,
         availableToBeSteped,
-        whoIsFieldUnderAttackBy,
-        isFrozen,
-        withPawnStep,
-        byWhom
-      ) => ({
-        figure,
-        color,
-        isChosen,
-        availableToBeSteped,
-        whoIsFieldUnderAttackBy,
-        isFrozen,
-        withPawnStep,
-        byWhom,
       })
     );
   }, []);
 
-  const {
-    figure,
-    color,
-    isChosen,
-    availableToBeSteped,
-    whoIsFieldUnderAttackBy,
-    isFrozen,
-    withPawnStep,
-    byWhom,
-  } = useSelectorTs(selector);
+  const { currentFigure, color, isChosen, availableToBeSteped } =
+    useSelectorTs(selector);
 
   const dispatch = useDispatchTs();
 
   useEffect(() => {
-    dispatch(getCellNewInfo({ id, shouldInitialize: true }));
+    dispatch(getCellNewInfo({ id, selfCreate: { colour, figure } }));
     setTimeout(() => {
       dispatch(getAttackingInfo(id));
     }, 0);
@@ -136,7 +112,7 @@ const Cell = ({ row, column, id }: CellP) => {
       }
     };
     const res = getColors(color);
-    switch (figure) {
+    switch (currentFigure) {
       case "pawn":
         return <Pawn {...res} />;
       case "knight":
@@ -152,7 +128,7 @@ const Cell = ({ row, column, id }: CellP) => {
       default:
         return "";
     }
-  }, [figure, color]);
+  }, [currentFigure, color]);
 
   return (
     <button
@@ -163,18 +139,11 @@ const Cell = ({ row, column, id }: CellP) => {
           : availableToBeSteped
           ? "yellow"
           : squareColor,
-        color: figure ? (color === "white" ? "white" : "black") : "pink",
+        color: currentFigure ? (color === "white" ? "white" : "black") : "pink",
       }}
       onClick={onClick}
     >
-      {shouldShowInfo
-        ? `${id + "" + figure + " " + color}, ${
-            "d " +
-            whoIsFieldUnderAttackBy.directly.join(",") +
-            "t " +
-            whoIsFieldUnderAttackBy.through.join(",")
-          }`
-        : cellFigure}
+      {cellFigure}
     </button>
   );
 };

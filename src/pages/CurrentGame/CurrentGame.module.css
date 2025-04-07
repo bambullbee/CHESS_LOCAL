@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+}
+
+.board {
+  width: 60vmin;
+  height: 60vmin;
+}
+
+.info {
+  align-self: stretch;
+  width: 200px;
+
+  color: white;
+  font-size: 30px;
+
+  background-color: blue;
+}

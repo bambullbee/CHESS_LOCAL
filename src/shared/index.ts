@@ -18,6 +18,8 @@ import type {
   processedLongRangeAttackers,
   initialStateI,
   attackingInfo,
+  baseCellInfo,
+  pawnStepI,
 } from "./types/boardSliceTypes";
 
 import Pawn from "./icons/Pawn";
@@ -26,6 +28,13 @@ import Knight from "./icons/Knight";
 import Bishop from "./icons/Bishop";
 import Queen from "./icons/Queen";
 import King from "./icons/King";
+
+import Input from "./ui/Input/Input";
+import SubmitButton from "./ui/SubmitButton/SubmitButton";
+
+import isValidFEN from "./utils/isValidFEN";
+
+import { gameSettingsI, parsedFENi, castling, gamesI } from "./types/appTypes";
 
 export {
   Pawn,
@@ -42,6 +51,9 @@ export {
   getDiagonalFields,
   getStartFigure,
   checkForRepeatBeforePush,
+  Input,
+  SubmitButton,
+  isValidFEN,
 };
 
 export type {
@@ -53,4 +65,10 @@ export type {
   initialStateI,
   attackingInfo,
   figureIconColors,
+  baseCellInfo,
+  pawnStepI,
+  gameSettingsI,
+  parsedFENi,
+  castling,
+  gamesI,
 };

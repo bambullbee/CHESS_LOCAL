@@ -1,0 +1,16 @@
+.link {
+  overflow: hidden;
+
+  padding: 5px;
+
+  border-radius: 10px;
+}
+
+.active {
+  width: 100%;
+  height: 100%;
+
+  color: white;
+
+  background-color: var(--dodger-blue);
+}

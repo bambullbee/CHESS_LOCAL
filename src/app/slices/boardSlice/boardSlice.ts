@@ -1,7 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import {
+  baseCellInfo,
+  castling,
   initialStateI,
+  pawnStepI,
   type Cell,
   type Cells,
   type FigureColor,
@@ -89,17 +92,22 @@ const boardSlice = createSlice({
     getCellNewInfo: (
       state,
       {
-        payload: { id, shouldInitialize, selfCreate },
+        payload: { id, selfCreate },
       }: PayloadAction<{
         id: number;
-        shouldInitialize?: boolean;
-        selfCreate?: { figure?: FigureType; colour?: FigureColor };
+        selfCreate?: baseCellInfo;
       }>
     ) => {
-      cellInfoHandler(state, id, shouldInitialize, selfCreate);
+      cellInfoHandler(state, id, selfCreate);
     },
-    getAttackingInfo: (state, { payload }) => {
-      return attackingInfoHandler(state, payload);
+    getAttackingInfo: (state, { payload }: PayloadAction<number>) => {
+      if (state.cells[payload].figure === "king") {
+        setTimeout(() => {
+          attackingInfoHandler(state, payload);
+        }, 0);
+      } else {
+        attackingInfoHandler(state, payload);
+      }
     },
     moveFigure: (state, { payload }: PayloadAction<number>) => {
       const chosenId = state.chosenCell;
@@ -235,8 +243,6 @@ const boardSlice = createSlice({
       payloadCell.figure = cc.figure;
       payloadCell.color = cc.color;
       //удаление всех отметок о ходящей фигуре из других клеток
-      //*удалять информацию о шахе не надо, так как фигура не может начинать ход, уже делая шах противнику
-      //!!посмотри, где и удаляется ли вообще информация об pathTowardsKing с обоих клеток
       const freezer = cc.attacks.isFreezer;
       if (freezer.is) {
         state.cells[freezer.target].attacked.isFrozen = {
@@ -376,6 +382,26 @@ const boardSlice = createSlice({
         state.chosenCell = null;
       }
     },
+    changeTurn: (state, { payload }: PayloadAction<FigureColor>) => {
+      state.turn = payload;
+    },
+    defineNotTouchedCells: (state, { payload }: PayloadAction<castling>) => {
+      if (payload.black.length !== 0) {
+        state.cells[60].wasTouched = false;
+        payload.black.forEach((id) => {
+          state.cells[id].wasTouched = false;
+        });
+      }
+      if (payload.white.length !== 0) {
+        state.cells[4].wasTouched = false;
+        payload.white.forEach((id) => {
+          state.cells[id].wasTouched = false;
+        });
+      }
+    },
+    definePawnStep: (state, { payload }: PayloadAction<pawnStepI>) => {
+      state.pawnStep = payload;
+    },
   },
 });
 
@@ -386,4 +412,7 @@ export const {
   changeChosenCell,
   getAttackingInfo,
   moveFigure,
+  changeTurn,
+  defineNotTouchedCells,
+  definePawnStep,
 } = boardSlice.actions;

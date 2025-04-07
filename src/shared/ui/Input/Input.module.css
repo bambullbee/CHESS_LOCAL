@@ -1,0 +1,47 @@
+.container {
+  margin: 0 auto;
+  padding-bottom: 20px;
+
+  font-size: 30px;
+
+  border-bottom: 3px solid black;
+}
+
+.label {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.input {
+  display: block;
+  width: 100%;
+  height: 30px;
+  margin-top: 10px;
+
+  color: white;
+  font-size: 20px;
+  text-align: center;
+
+  box-sizing: border-box;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  background-color: rgb(49, 49, 255);
+}
+
+.errorblock {
+  padding-bottom: 0px;
+}
+
+.errorblock .error {
+  min-height: 20px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+
+  color: rgb(156, 1, 1);
+  font-size: 15px;
+  text-align: center;
+
+  box-sizing: border-box;
+}

@@ -1,13 +1,25 @@
-import { Board } from "@/widgets/Board";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Layout } from "@/widgets/Layout";
+import { NewGame } from "@/pages/NewGame";
+import Redirect from "@/pages/Redirect/Redirect";
+import { CurrentGame } from "@/pages/CurrentGame";
+import { Games } from "@/pages/Games";
 
-const App = () => {
+function App() {
   return (
-    <>
-      <div>
-        <Board />
-      </div>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Redirect />} />
+          <Route path="newgame" element={<NewGame />} />
+          <Route path="games" element={<Games />} />
+          <Route path="games/:id" element={<CurrentGame />} />
+          <Route path="leaderboard" element={<h1>Leaderboard</h1>} />
+          <Route path="*" element={<div>404 Not Found</div>} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
-};
+}
 
 export default App;

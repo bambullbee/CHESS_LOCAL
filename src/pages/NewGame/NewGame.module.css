@@ -1,0 +1,16 @@
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+  min-width: 100%;
+}
+
+.container {
+  margin: auto;
+}
+
+.formInnerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
