@@ -6,6 +6,8 @@ import { getDiagonalFields } from "./utils/getAttackedCells/getAttackedCells";
 import getStartFigure from "./utils/getStartFigure";
 import createSelectorTs from "./withTypesHooks/createSelector";
 
+import isUpperCase from "./utils/isUpperCase";
+
 import type {
   FigureColor,
   FigureType,
@@ -54,6 +56,7 @@ export {
   Input,
   SubmitButton,
   isValidFEN,
+  isUpperCase,
 };
 
 export type {

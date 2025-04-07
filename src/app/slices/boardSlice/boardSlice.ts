@@ -14,6 +14,8 @@ import {
 import attackingInfoHandler from "./helpers/attackingInfoHandler";
 import cellInfoHandler from "./helpers/cellInfoHandler";
 import findAndDelete from "./helpers/findAndDelete";
+import cleanLocalStorageGameInfo from "./helpers/cleanLocalStorageGameInfo";
+import updateLocalStorageGameInfo from "./helpers/updateLocalStorageGameInfo.ts";
 
 const CELLS: Cells = {};
 
@@ -35,7 +37,7 @@ const emptyCell: Cell = {
     },
   },
   withPawnStep: false,
-  wasTouched: false,
+  wasTouched: true,
 };
 
 // инициализация доски
@@ -62,7 +64,7 @@ for (let e = 0; e <= 7; e++) {
         },
       },
       withPawnStep: false,
-      wasTouched: false,
+      wasTouched: true,
     };
   }
 }
@@ -309,6 +311,7 @@ const boardSlice = createSlice({
       //даем ход другой стороне
       state.turn = state.turn === "white" ? "black" : "white";
       //но также проверяем, не мат ли
+      let isMate = false;
       if (state.check[defenseSide].is) {
         const kingId = state.kingId[defenseSide];
         //клетки без союзных фигур
@@ -338,6 +341,7 @@ const boardSlice = createSlice({
         //если двойной шах, то учитывается только то, может ли ходить король
         if (state.check[defenseSide].byWhom.length > 1) {
           if (isEveryCellAttacked) {
+            isMate = true;
             state.turn = null;
           }
           //иначе учитывается еще возможность союзных фигур прикрыть короля
@@ -357,8 +361,15 @@ const boardSlice = createSlice({
             );
           })
         ) {
+          isMate = true;
           state.turn = null;
         }
+      }
+      if (isMate) {
+        cleanLocalStorageGameInfo();
+      } else {
+        //!!!2
+        updateLocalStorageGameInfo(state, 2);
       }
     },
     changeChosenCell: (state, { payload }) => {

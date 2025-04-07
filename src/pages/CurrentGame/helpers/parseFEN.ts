@@ -1,4 +1,4 @@
-import { baseCellInfo, parsedFENi, pawnStepI } from "@/shared";
+import { baseCellInfo, isUpperCase, parsedFENi, pawnStepI } from "@/shared";
 import literalCellToId from "./literalCellToId";
 
 interface castlingI {
@@ -6,16 +6,14 @@ interface castlingI {
   white: number[];
 }
 
-const isUpperCase = (char: string) => {
-  return char === char.toUpperCase() && char !== char.toLowerCase();
-};
-
 const parseFEN = (FEN: string): parsedFENi => {
-  console.log(FEN);
   const parts = FEN.split(" ");
-  const figures = parts[0]
-    .replace(/\//g, "")
-    .replace(/\d/g, (digit) => "W".repeat(parseInt(digit, 10)))
+  let preFigures = parts[0].includes("W")
+    ? parts[0]
+    : parts[0]
+        .replace(/\//g, "")
+        .replace(/\d/g, (digit) => "W".repeat(parseInt(digit, 10)));
+  const figures = preFigures
     .split("")
     .reverse()
     .map((symb) => {
@@ -83,12 +81,8 @@ const parseFEN = (FEN: string): parsedFENi => {
   };
   if (parts[3] !== "-") {
     pawnStep.is = true;
-    const cells = parts[3].split("-");
-    pawnStep.pawn = literalCellToId(cells[1]);
-    pawnStep.steppedField =
-      cells.reduce((acc, cell) => {
-        return acc + literalCellToId(cell);
-      }, 0) / 2;
+    pawnStep.pawn = literalCellToId(parts[3] + (turn === "white" ? 8 : -8));
+    pawnStep.steppedField = literalCellToId(parts[3]);
   }
   return { figures, turn, castling, pawnStep };
 };
