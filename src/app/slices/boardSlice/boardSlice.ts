@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   baseCellInfo,
   castling,
+  createAsyncThunkTs,
   initialStateI,
   pawnStepI,
   type Cell,
@@ -85,29 +86,30 @@ const initialState: initialStateI = {
   },
 };
 
+interface initializationInfoI {
+  id: number;
+  selfCreate: baseCellInfo;
+}
+
 const boardSlice = createSlice({
   name: "board",
   initialState,
   reducers: {
     getCellNewInfo: (
       state,
-      {
-        payload: { id, selfCreate },
-      }: PayloadAction<{
-        id: number;
-        selfCreate?: baseCellInfo;
-      }>
+      { payload: { id, selfCreate } }: PayloadAction<initializationInfoI>
     ) => {
       cellInfoHandler(state, id, selfCreate);
     },
     getAttackingInfo: (state, { payload }: PayloadAction<number>) => {
-      if (state.cells[payload].figure === "king") {
-        setTimeout(() => {
-          attackingInfoHandler(state, payload);
-        }, 0);
-      } else {
-        attackingInfoHandler(state, payload);
-      }
+      // if (state.cells[payload].figure === "king") {
+      //   setTimeout(() => {
+      //     attackingInfoHandler(state, payload);
+      //   }, 0);
+      // } else {
+      //   attackingInfoHandler(state, payload);
+      // }
+      attackingInfoHandler(state, payload);
     },
     moveFigure: (state, { payload }: PayloadAction<number>) => {
       const chosenId = state.chosenCell;

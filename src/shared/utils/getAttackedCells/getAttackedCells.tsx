@@ -260,7 +260,6 @@ const getAttackedCells = ({
                     state.cells[attacker].color !== potentialAttackerColor
                 )
               ) {
-                console.log(rookId, rookId + sign * i);
                 cellsToCheck.push(rookId + sign * i);
               } else {
                 shouldCheck = false;

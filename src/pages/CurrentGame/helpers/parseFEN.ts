@@ -11,6 +11,7 @@ const isUpperCase = (char: string) => {
 };
 
 const parseFEN = (FEN: string): parsedFENi => {
+  console.log(FEN);
   const parts = FEN.split(" ");
   const figures = parts[0]
     .replace(/\//g, "")
@@ -19,22 +20,29 @@ const parseFEN = (FEN: string): parsedFENi => {
     .reverse()
     .map((symb) => {
       const result: baseCellInfo = { figure: null, colour: null };
-      switch (symb.toLowerCase()) {
-        case "w":
-          result.figure = null;
-        case "p":
-          result.figure = "pawn";
-        case "n":
-          result.figure = "knight";
-        case "b":
-          result.figure = "bishop";
-        case "r":
-          result.figure = "rook";
-        case "q":
-          result.figure = "queen";
-        case "k":
-          result.figure = "king";
+      const lS = symb.toLowerCase();
+      if (lS === "w") {
+        result.figure = null;
       }
+      if (lS === "p") {
+        result.figure = "pawn";
+      }
+      if (lS === "n") {
+        result.figure = "knight";
+      }
+      if (lS === "b") {
+        result.figure = "bishop";
+      }
+      if (lS === "r") {
+        result.figure = "rook";
+      }
+      if (lS === "k") {
+        result.figure = "king";
+      }
+      if (lS === "q") {
+        result.figure = "queen";
+      }
+
       if (symb !== "W") {
         result.colour = isUpperCase(symb) ? "white" : "black";
       }
@@ -47,15 +55,18 @@ const parseFEN = (FEN: string): parsedFENi => {
   };
   if (parts[2] !== "-") {
     parts[2].split("").forEach((symb) => {
-      switch (symb) {
-        case "K":
-          castling.white.push(1);
-        case "Q":
-          castling.white.push(8);
-        case "k":
-          castling.black.push(57);
-        case "q":
-          castling.black.push(64);
+      if (symb === "K") {
+        castling.white.push(1);
+      }
+      if (symb === "Q") {
+        castling.white.push(8);
+      }
+
+      if (symb === "k") {
+        castling.black.push(57);
+      }
+      if (symb === "q") {
+        castling.black.push(64);
       }
     });
     if (castling.white.length > 0) {

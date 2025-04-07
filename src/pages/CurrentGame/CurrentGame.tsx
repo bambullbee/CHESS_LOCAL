@@ -8,14 +8,12 @@ import {
   useSelectorTs,
 } from "@/shared";
 import { Board } from "@/widgets/Board";
-import parseFEN from "@/widgets/Board/helpers/parseFEN";
+import parseFEN from "./helpers/parseFEN";
 import styles from "./CurrentGame.module.css";
-import { useLayoutEffect, useMemo } from "react";
-import { changeTurn } from "@/app";
+import { useMemo } from "react";
 
 const CurrentGame = () => {
   const { id } = useParams<{ id: string }>();
-  const dispatch = useDispatchTs();
 
   const {
     setup,

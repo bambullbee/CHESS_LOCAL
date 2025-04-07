@@ -74,7 +74,7 @@ const Cell = ({ row, column, id, colour, figure }: CellP) => {
 
   const { currentFigure, color, isChosen, availableToBeSteped } =
     useSelectorTs(selector);
-
+  console.log(id, colour, figure);
   const dispatch = useDispatchTs();
 
   useEffect(() => {

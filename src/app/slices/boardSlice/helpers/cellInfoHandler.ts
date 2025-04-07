@@ -15,7 +15,7 @@ const cellInfoHandler = (
   const { figure, colour } = selfCreate;
   cell.figure = figure;
   cell.color = colour;
-  if (state.cells[id].figure === "king") {
+  if (figure === "king") {
     state.kingId[state.cells[id].color] = id;
   }
 };

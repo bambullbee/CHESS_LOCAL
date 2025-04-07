@@ -44,7 +44,6 @@ const NewGame = () => {
     const black = formData.get("black") as string;
     if (black === "") {
       isError = true;
-      console.log("err");
       setValidationError((prev) => ({
         ...prev,
         black: "Необходимо ввести имя пользователя",
@@ -88,9 +87,11 @@ const NewGame = () => {
       };
       localStorage.setItem(
         "games",
-        JSON.stringify({ ...games, [uniqueId]: currentGame } as gamesI)
+        JSON.stringify({
+          ...games,
+          [uniqueId.toString()]: currentGame,
+        } as gamesI)
       );
-      console.log(JSON.stringify({ ...games, [uniqueId]: currentGame }));
       navigate(`/games/${uniqueId}`);
     }
   };

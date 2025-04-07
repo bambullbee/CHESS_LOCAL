@@ -1,9 +1,4 @@
-import {
-  getAttackedCells,
-  initialStateI,
-  processedLongRangeAttackers,
-  attackingInfo,
-} from "@/shared";
+import { getAttackedCells, initialStateI, attackingInfo } from "@/shared";
 
 const attackingInfoHandler = (state: initialStateI, payload: number) => {
   let attackingInfo: attackingInfo;
