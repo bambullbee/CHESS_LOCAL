@@ -5,6 +5,7 @@ import { Form } from "@/widgets/Form";
 import { gameSettingsI, gamesI, Input, isValidFEN } from "@/shared";
 
 import styles from "./NewGame.module.css";
+import { Link } from "react-router-dom";
 
 const getUniqueIdForLS = (id?: number): number => {
   if (!id) {
@@ -23,6 +24,7 @@ const NewGame = () => {
   const [validationError, setValidationError] = useState<{
     [key: string]: string;
   }>({});
+  const [isWarning, setIsWarning] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -78,21 +80,37 @@ const NewGame = () => {
     }
 
     if (!isError) {
-      const uniqueId = getUniqueIdForLS();
-      const games = localStorage.getItem("games") as unknown as gamesI;
-      const currentGame = {
-        players: { white, black },
-        timerInfo: { timer, bonus },
-        setup,
-      };
-      localStorage.setItem(
-        "games",
-        JSON.stringify({
-          ...games,
-          [uniqueId.toString()]: currentGame,
-        } as gamesI)
-      );
-      navigate(`/games/${uniqueId}`);
+      const games = JSON.parse(
+        localStorage.getItem("games")
+      ) as unknown as gamesI;
+      let gamesCount = 0;
+      for (let key in games) {
+        if (games[key]) {
+          gamesCount += 1;
+        }
+      }
+      if (gamesCount >= 4) {
+        setIsWarning(true);
+      } else {
+        const uniqueId = getUniqueIdForLS();
+        const currentGame = {
+          players: { white, black },
+          timerInfo: {
+            timer: { black: [timer, "00"], white: [timer, "00"] },
+            startMinutes: timer,
+            bonus,
+          },
+          setup,
+        };
+        localStorage.setItem(
+          "games",
+          JSON.stringify({
+            ...games,
+            [uniqueId.toString()]: currentGame,
+          } as gamesI)
+        );
+        navigate(`/games/${uniqueId}`);
+      }
     }
   };
 
@@ -154,6 +172,18 @@ const NewGame = () => {
             </div>
           </div>
         </Form>
+        <div
+          className={`${styles.warning} ${
+            isWarning ? styles.activeWarning : ""
+          }`}
+        >
+          Количество активных игр не может быть больше четырех. Вы можете
+          продолжить играть в уже активные или удалить некоторые во вкладке
+          "Партии"
+          <Link className={styles.link} to="/games">
+            Перейти
+          </Link>
+        </div>
       </div>
     </div>
   );

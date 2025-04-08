@@ -7,6 +7,7 @@ import {
   changeTurn,
   defineNotTouchedCells,
   definePawnStep,
+  resetBoardSlice,
 } from "./slices/boardSlice/boardSlice";
 import { store } from "./store";
 
@@ -22,5 +23,6 @@ export {
   changeTurn,
   defineNotTouchedCells,
   definePawnStep,
+  resetBoardSlice,
   type RootState,
 };

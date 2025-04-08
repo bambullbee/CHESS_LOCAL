@@ -4,6 +4,7 @@ import { NewGame } from "@/pages/NewGame";
 import Redirect from "@/pages/Redirect/Redirect";
 import { CurrentGame } from "@/pages/CurrentGame";
 import { Games } from "@/pages/Games";
+import { Leaderboard } from "@/pages/Leaderboard";
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
           <Route path="newgame" element={<NewGame />} />
           <Route path="games" element={<Games />} />
           <Route path="games/:id" element={<CurrentGame />} />
-          <Route path="leaderboard" element={<h1>Leaderboard</h1>} />
+          <Route path="leaderboard" element={<Leaderboard />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Route>
       </Routes>

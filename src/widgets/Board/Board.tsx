@@ -9,9 +9,10 @@ type cellHandler = (row: number, col: number, id: number) => void;
 
 interface boardI {
   setup: parsedFENi;
+  isWithoutLogic?: boolean;
 }
 
-const Board = ({ setup }: boardI) => {
+const Board = ({ setup, isWithoutLogic }: boardI) => {
   const CELLS = useMemo(() => {
     return Array.from({ length: 8 }, (_, ind) => {
       return Array.from({ length: 8 }, (_, i) => {
@@ -24,6 +25,7 @@ const Board = ({ setup }: boardI) => {
             id={id}
             figure={setup.figures[id - 1].figure}
             colour={setup.figures[id - 1].colour}
+            isWithoutLogic={isWithoutLogic}
           />
         );
       });

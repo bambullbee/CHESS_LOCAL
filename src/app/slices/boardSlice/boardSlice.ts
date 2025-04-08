@@ -3,19 +3,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   baseCellInfo,
   castling,
-  createAsyncThunkTs,
   initialStateI,
   pawnStepI,
   type Cell,
   type Cells,
   type FigureColor,
-  type FigureType,
 } from "@/shared";
 import attackingInfoHandler from "./helpers/attackingInfoHandler";
 import cellInfoHandler from "./helpers/cellInfoHandler";
 import findAndDelete from "./helpers/findAndDelete";
 import cleanLocalStorageGameInfo from "./helpers/cleanLocalStorageGameInfo";
 import updateLocalStorageGameInfo from "./helpers/updateLocalStorageGameInfo.ts";
+import updateWinnersLocalStorage from "./helpers/updateWinnersLocalStorage";
 
 const CELLS: Cells = {};
 
@@ -113,7 +112,12 @@ const boardSlice = createSlice({
       // }
       attackingInfoHandler(state, payload);
     },
-    moveFigure: (state, { payload }: PayloadAction<number>) => {
+    moveFigure: (
+      state,
+      {
+        payload: { id: payload, gameId },
+      }: PayloadAction<{ id: number; gameId: number }>
+    ) => {
       const chosenId = state.chosenCell;
       const cc = state.cells[chosenId];
       const defenseSide: FigureColor = cc.color === "black" ? "white" : "black";
@@ -366,16 +370,16 @@ const boardSlice = createSlice({
         }
       }
       if (isMate) {
-        cleanLocalStorageGameInfo();
+        updateWinnersLocalStorage(payloadCell.color, gameId);
+        cleanLocalStorageGameInfo(gameId);
       } else {
-        //!!!2
-        updateLocalStorageGameInfo(state, 2);
+        updateLocalStorageGameInfo(state, gameId);
       }
     },
     changeChosenCell: (state, { payload }) => {
       const payloadCell = state.cells[payload];
       const chosenId = state.chosenCell;
-      if (Boolean(payload)) {
+      if (Boolean(payload) && state.turn !== null) {
         if (chosenId) {
           if (
             chosenId === payload ||
@@ -415,6 +419,9 @@ const boardSlice = createSlice({
     definePawnStep: (state, { payload }: PayloadAction<pawnStepI>) => {
       state.pawnStep = payload;
     },
+    resetBoardSlice: () => {
+      return initialState;
+    },
   },
 });
 
@@ -428,4 +435,5 @@ export const {
   changeTurn,
   defineNotTouchedCells,
   definePawnStep,
+  resetBoardSlice,
 } = boardSlice.actions;

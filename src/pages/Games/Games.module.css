@@ -1,0 +1,29 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  height: 100px;
+  margin: 0 auto;
+  margin-top: 50px;
+  padding: 10px;
+
+  font-size: 40px;
+  color: black;
+  text-align: center;
+
+  background-color: #fff;
+  border: 3px solid black;
+  border-radius: 10px;
+}
+
+.link {
+  padding: 5px;
+
+  color: #fff;
+
+  border: 3px solid black;
+  border-radius: 10px;
+  background-color: var(--dodger-blue);
+}

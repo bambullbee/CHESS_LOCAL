@@ -22,6 +22,7 @@ import {
   moveFigure,
 } from "@/app";
 import { current } from "@reduxjs/toolkit";
+import { useParams } from "react-router-dom";
 
 interface CellP {
   row: number;
@@ -29,9 +30,10 @@ interface CellP {
   id: number;
   figure: FigureType;
   colour: FigureColor;
+  isWithoutLogic: boolean;
 }
 
-const Cell = ({ row, column, id, colour, figure }: CellP) => {
+const Cell = ({ row, column, id, colour, figure, isWithoutLogic }: CellP) => {
   const shouldShowInfo = false;
   //заменить хардкод цветов на получение цветов из стора-тема
   const squareColor = useMemo(() => {
@@ -47,48 +49,75 @@ const Cell = ({ row, column, id, colour, figure }: CellP) => {
       }
     }
   }, []);
+  let selector;
+  if (!isWithoutLogic) {
+    selector = useMemo(() => {
+      return createSelectorTs(
+        [
+          (state) => state.board.cells[id].figure,
+          (state) => state.board.cells[id].color,
+          (state) => state.board.chosenCell === id,
+          (state) => {
+            if (state.board.cells[state.board.chosenCell]) {
+              return state.board.cells[
+                state.board.chosenCell
+              ].attacks.availableCells.includes(id);
+            }
+            return false;
+          },
+        ],
+        (figure, color, isChosen, availableToBeSteped) => ({
+          currentFigure: figure,
+          color,
+          isChosen,
+          availableToBeSteped,
+        })
+      );
+    }, []);
+  }
 
-  const selector = useMemo(() => {
-    return createSelectorTs(
-      [
-        (state) => state.board.cells[id].figure,
-        (state) => state.board.cells[id].color,
-        (state) => state.board.chosenCell === id,
-        (state) => {
-          if (state.board.cells[state.board.chosenCell]) {
-            return state.board.cells[
-              state.board.chosenCell
-            ].attacks.availableCells.includes(id);
-          }
-          return false;
-        },
-      ],
-      (figure, color, isChosen, availableToBeSteped) => ({
-        currentFigure: figure,
-        color,
-        isChosen,
-        availableToBeSteped,
-      })
-    );
-  }, []);
-
-  const { currentFigure, color, isChosen, availableToBeSteped } =
-    useSelectorTs(selector);
+  let currentFigure: FigureType,
+    color: FigureColor,
+    isChosen: boolean,
+    availableToBeSteped: boolean;
+  if (!isWithoutLogic) {
+    const {
+      currentFigure: selectorCurrentFigure,
+      color: selectorColor,
+      isChosen: selectorIsChosen,
+      availableToBeSteped: selectorAvailableToBeSteped,
+    } = useSelectorTs(selector);
+    currentFigure = selectorCurrentFigure;
+    color = selectorColor;
+    isChosen = selectorIsChosen;
+    availableToBeSteped = selectorAvailableToBeSteped;
+  } else {
+    color = colour;
+    currentFigure = figure;
+    isChosen = false;
+    availableToBeSteped = false;
+  }
   const dispatch = useDispatchTs();
 
   useEffect(() => {
-    dispatch(getCellNewInfo({ id, selfCreate: { colour, figure } }));
-    setTimeout(() => {
-      dispatch(getAttackingInfo(id));
-    }, 0);
+    if (!isWithoutLogic) {
+      dispatch(getCellNewInfo({ id, selfCreate: { colour, figure } }));
+      setTimeout(() => {
+        dispatch(getAttackingInfo(id));
+      }, 0);
+    }
   }, []);
 
+  const { id: gameID } = useParams<{ id: string }>();
+
   const onClick = () => {
-    if (availableToBeSteped) {
-      dispatch(moveFigure(id));
-      dispatch(changeChosenCell(null));
-    } else {
-      dispatch(changeChosenCell(id));
+    if (!isWithoutLogic) {
+      if (availableToBeSteped) {
+        dispatch(moveFigure({ id, gameId: parseInt(gameID) }));
+        dispatch(changeChosenCell(null));
+      } else {
+        dispatch(changeChosenCell(id));
+      }
     }
   };
 

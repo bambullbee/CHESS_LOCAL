@@ -124,12 +124,13 @@ table {
 }
 
 input,
-button {
-  border: none;
-  outline: none;
-}
-
+button,
 a {
   text-decoration: none;
   color: inherit;
+  font-family: serif;
+
+  border: none;
+  outline: none;
+  background-color: inherit;
 }

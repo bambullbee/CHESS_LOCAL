@@ -36,7 +36,18 @@ import SubmitButton from "./ui/SubmitButton/SubmitButton";
 
 import isValidFEN from "./utils/isValidFEN";
 
-import { gameSettingsI, parsedFENi, castling, gamesI } from "./types/appTypes";
+import {
+  gameSettingsI,
+  parsedFENi,
+  castling,
+  gamesI,
+  leaderboardI,
+  timerI,
+} from "./types/appTypes";
+
+import useLocalStorage from "./hooks/useLocalStorage";
+
+import shouldApplyInitialValueTypeCreator from "./utils/shouldApplyInitialValueTypeCreator";
 
 export {
   Pawn,
@@ -57,6 +68,8 @@ export {
   SubmitButton,
   isValidFEN,
   isUpperCase,
+  useLocalStorage,
+  shouldApplyInitialValueTypeCreator,
 };
 
 export type {
@@ -74,4 +87,6 @@ export type {
   parsedFENi,
   castling,
   gamesI,
+  leaderboardI,
+  timerI,
 };

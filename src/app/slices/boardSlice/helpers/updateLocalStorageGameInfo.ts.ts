@@ -29,7 +29,7 @@ const cellIdToColumn = (id: number) => {
 };
 
 const updateLocalStorageGameInfo = (state: initialStateI, id: number) => {
-  const games = localStorage.getItem("games") as unknown as gamesI;
+  const games = JSON.parse(localStorage.getItem("games")) as unknown as gamesI;
   const currentGame = games[id];
   const cells = state.cells;
   let FEN = "";
