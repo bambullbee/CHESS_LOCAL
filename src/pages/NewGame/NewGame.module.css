@@ -26,6 +26,7 @@
   top: 50%;
   left: 50%;
 
+  display: none;
   width: 90%;
   padding: 10px;
 
@@ -36,7 +37,6 @@
 
   background-color: var(--dodger-blue);
   opacity: 0;
-  transition: opacity 0.2s;
   border: 3px solid black;
   border-radius: 10px;
 }
@@ -54,5 +54,15 @@
 }
 
 .activeWarning {
-  opacity: 1;
+  display: block;
+  animation: opacityChange 0.2s forwards;
+}
+
+@keyframes opacityChange {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
