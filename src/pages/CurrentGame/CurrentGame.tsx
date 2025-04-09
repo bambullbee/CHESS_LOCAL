@@ -19,7 +19,7 @@ const CurrentGame = () => {
 
   const {
     setup,
-    players: { white, black },
+    players,
     timerInfo: { timer, bonus },
   } = useMemo(() => {
     return (JSON.parse(localStorage.getItem("games")) as gamesI)[
@@ -33,18 +33,27 @@ const CurrentGame = () => {
   });
 
   const selector = useMemo(() => {
-    return createSelectorTs([(state) => state.board.turn], (turn) => {
-      return {
-        turn,
-      };
-    });
+    return createSelectorTs(
+      [
+        (state) => state.board.turn,
+        (state) => state.board.win.condition,
+        (state) => state.board.win.winner,
+      ],
+      (turn, winCondition, winner) => {
+        return {
+          turn,
+          winCondition,
+          winner,
+        };
+      }
+    );
   }, []);
 
   useLayoutEffect(() => {
     dispatch(resetBoardSlice());
   }, []);
 
-  const { turn } = useSelectorTs(selector);
+  const { turn, winCondition, winner } = useSelectorTs(selector);
 
   //IIFE использовано
   useEffect(
@@ -64,7 +73,7 @@ const CurrentGame = () => {
             let seconds = parseInt(timer[turn][1]);
             let minutes = parseInt(timer[turn][0]);
             if (seconds === 0 && minutes === 0) {
-              dispatch(changeTurn(null));
+              dispatch(changeTurn({ color: null, gameId: parseInt(id) }));
               clearInterval(intervalId);
               return;
             }
@@ -76,7 +85,7 @@ const CurrentGame = () => {
               isMetWithStartTimer = true;
             } else {
               if (!wasBonusUsed) {
-                seconds += Number(currentGame.timerInfo.bonus);
+                seconds += Number(bonus);
                 wasBonusUsed = true;
                 if (seconds >= 60) {
                   minutes += 1;
@@ -131,7 +140,8 @@ const CurrentGame = () => {
       <div className={styles.info}>
         <div style={{ color: "white" }}>{gameTimer.white}</div>
         <div style={{ color: "black" }}>{gameTimer.black}</div>
-        <div>{turn}</div>
+        {turn && <div>Ход: {players[turn]}</div>}
+        {winCondition && <div>{`${winCondition}. Победитель: ${winner}`}</div>}
       </div>
     </div>
   );

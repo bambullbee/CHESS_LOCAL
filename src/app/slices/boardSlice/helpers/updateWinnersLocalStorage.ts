@@ -1,8 +1,16 @@
-import { FigureColor, gamesI, leaderboardI } from "@/shared";
+import {
+  FigureColor,
+  gamesI,
+  initialStateI,
+  leaderboardI,
+  winConditionT,
+} from "@/shared";
 
 const updateWinnersLocalStorage = (
   winnerColor: FigureColor,
-  gameId: number
+  gameId: number,
+  winnerCondition: winConditionT,
+  state: initialStateI
 ) => {
   let leaderboard = JSON.parse(
     localStorage.getItem("leaderboard")
@@ -11,7 +19,9 @@ const updateWinnersLocalStorage = (
   if (!leaderboard) {
     leaderboard = {};
   }
-  const winnerResults = leaderboard[games[gameId].players[winnerColor]];
+  const winnerName = games[gameId].players[winnerColor];
+  state.win = { condition: winnerCondition, winner: winnerName };
+  const winnerResults = leaderboard[winnerName];
   leaderboard[games[gameId].players[winnerColor]] = (
     winnerResults ? parseInt(winnerResults) + 1 : 1
   ).toString();

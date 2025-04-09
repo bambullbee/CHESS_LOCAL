@@ -22,6 +22,7 @@ import type {
   attackingInfo,
   baseCellInfo,
   pawnStepI,
+  winConditionT,
 } from "./types/boardSliceTypes";
 
 import Pawn from "./icons/Pawn";
@@ -89,4 +90,5 @@ export type {
   gamesI,
   leaderboardI,
   timerI,
+  winConditionT,
 };

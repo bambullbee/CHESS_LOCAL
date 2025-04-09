@@ -76,6 +76,10 @@ const initialState: initialStateI = {
     white: { is: false, byWhom: [] },
   },
   turn: "white",
+  win: {
+    condition: null,
+    winner: null,
+  },
   pawnStep: {
     is: false,
     pawn: null,
@@ -370,7 +374,7 @@ const boardSlice = createSlice({
         }
       }
       if (isMate) {
-        updateWinnersLocalStorage(payloadCell.color, gameId);
+        updateWinnersLocalStorage(payloadCell.color, gameId, "Мат", state);
         cleanLocalStorageGameInfo(gameId);
       } else {
         updateLocalStorageGameInfo(state, gameId);
@@ -399,8 +403,19 @@ const boardSlice = createSlice({
         state.chosenCell = null;
       }
     },
-    changeTurn: (state, { payload }: PayloadAction<FigureColor>) => {
-      state.turn = payload;
+    changeTurn: (
+      state,
+      {
+        payload: { color, gameId },
+      }: PayloadAction<{ color: FigureColor; gameId?: number }>
+    ) => {
+      const turn = state.turn;
+      if (color === null) {
+        const winnerColor = turn === "white" ? "black" : "white";
+        updateWinnersLocalStorage(winnerColor, gameId, "Время истекло", state);
+        cleanLocalStorageGameInfo(gameId);
+      }
+      state.turn = color;
     },
     defineNotTouchedCells: (state, { payload }: PayloadAction<castling>) => {
       if (payload.black.length !== 0) {

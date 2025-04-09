@@ -33,6 +33,8 @@ interface pawnStepI {
   steppedField: number;
 }
 
+type winConditionT = "Время истекло" | "Мат";
+
 interface initialStateI {
   cells: Cells;
   chosenCell: number | null;
@@ -41,6 +43,7 @@ interface initialStateI {
     white: { is: boolean; byWhom: number[] };
   };
   turn: FigureColor;
+  win: { condition: winConditionT; winner: string };
   //шаг пешки на два поля вперед
   pawnStep: pawnStepI;
   kingId: { black: number; white: number };
@@ -87,4 +90,5 @@ export type {
   attackingInfo,
   baseCellInfo,
   pawnStepI,
+  winConditionT,
 };

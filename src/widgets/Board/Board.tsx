@@ -35,7 +35,7 @@ const Board = ({ setup, isWithoutLogic }: boardI) => {
   const dispatch = useDispatchTs();
 
   useLayoutEffect(() => {
-    dispatch(changeTurn(setup.turn));
+    dispatch(changeTurn({ color: setup.turn }));
     dispatch(defineNotTouchedCells(setup.castling));
     dispatch(definePawnStep(setup.pawnStep));
   }, []);
