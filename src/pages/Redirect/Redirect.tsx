@@ -1,8 +1,19 @@
-import React from "react";
+import { useLayoutEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 
 const Redirect = () => {
-  //здесь логика по редиректу в зависимости от того, есть ли уже доступные игры
-  return <div>Сейчас Вас перенаправят на стартовую страницу</div>;
+  const [hasProgress, setHasProgress] = useState(false);
+  useLayoutEffect(() => {
+    const gamesString = localStorage.getItem("games");
+    if (gamesString && gamesString !== "{}") {
+      setHasProgress(true);
+    }
+  }, []);
+  if (hasProgress) {
+    return <Navigate to="/games" replace />;
+  } else {
+    return <Navigate to="/newgame" replace />;
+  }
 };
 
 export default Redirect;
