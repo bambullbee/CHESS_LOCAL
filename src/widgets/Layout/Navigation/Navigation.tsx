@@ -10,11 +10,7 @@ const Navigation = ({ handleMenuLinkClick }: navigationI) => {
   return (
     <nav className={styles.nav}>
       <ul className={styles.list}>
-        <HeaderLink
-          title="Новая Игра"
-          path="/newgame"
-          onClick={handleMenuLinkClick}
-        />
+        <HeaderLink title="Новая Игра" path="/" onClick={handleMenuLinkClick} />
         <HeaderLink
           title="Партии"
           path="/games"
