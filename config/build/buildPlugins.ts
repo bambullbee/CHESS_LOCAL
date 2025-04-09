@@ -48,6 +48,12 @@ export function buildPlugins(options: BuildOptions): Configuration["plugins"] {
             from: path.resolve(paths.public, "locales"),
             to: path.resolve(paths.output, "locales"),
           },
+          {
+            from: path.resolve(paths.root, "vercel.json"),
+            to: path.resolve(paths.root, "dist", "vercel.json"),
+            toType: "file",
+            noErrorOnMissing: true,
+          },
         ],
       })
     );

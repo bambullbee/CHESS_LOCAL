@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkpreset=self.webpackChunkpreset||[]).push([[201],{201:(e,t,u)=>{u.r(t),u.d(t,{default:()=>r});var n=u(540);const r=function(){return n.createElement("h1",null,"About")}}}]);
-//# sourceMappingURL=201.317329719a9c62eac77b.js.map

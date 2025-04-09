@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkpreset=self.webpackChunkpreset||[]).push([[691],{691:(e,t,n)=>{n.r(t),n.d(t,{default:()=>s});var r=n(540);const s=function(){return r.createElement("h1",null,"Shop")}}}]);
-//# sourceMappingURL=691.c9d845e3ab497e7fb6c1.js.map

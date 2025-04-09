@@ -1,1 +1,0 @@
-{"version":3,"file":"201.317329719a9c62eac77b.js","mappings":"yIAMA,QAJc,WACZ,OAAOA,EAAAA,cAAA,UAAI,QACb,C","sources":["webpack://preset/./src/pages/About/About.tsx"],"sourcesContent":["import React from \"react\";\r\n\r\nconst About = () => {\r\n  return <h1>About</h1>;\r\n};\r\n\r\nexport default About;\r\n"],"names":["React"],"sourceRoot":""}
