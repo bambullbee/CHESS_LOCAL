@@ -3,6 +3,7 @@
   flex-shrink: 0;
   width: calc(100% / 8);
   height: calc(100% / 8);
+  padding: 3px;
 
   color: rgb(176, 202, 209);
   font-size: 8px;

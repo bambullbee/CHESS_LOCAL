@@ -122,17 +122,13 @@ const Cell = ({ row, column, id, colour, figure, isWithoutLogic }: CellP) => {
     const getColors = (color: FigureColor): figureIconColors => {
       if (color === "white") {
         return {
-          firstColor: "#D5D5D5",
-          secondColor: "#FFFBFB",
-          thirdColor: "#FFFFFF",
-          borderColor: "#000000",
+          firstColor: "#000000",
+          secondColor: "#FFFFFF",
         };
       } else {
         return {
-          firstColor: "#555555",
-          secondColor: "#424242",
-          thirdColor: "#000000",
-          borderColor: "#FFFFFF",
+          firstColor: "#FFFFFF",
+          secondColor: "#000000",
         };
       }
     };
@@ -159,12 +155,7 @@ const Cell = ({ row, column, id, colour, figure, isWithoutLogic }: CellP) => {
     <button
       className={s.cell}
       style={{
-        backgroundColor: isChosen
-          ? "blue"
-          : availableToBeSteped
-          ? "yellow"
-          : squareColor,
-        color: currentFigure ? (color === "white" ? "white" : "black") : "pink",
+        backgroundColor: isChosen ? "rgb(244, 220, 185)" : squareColor,
       }}
       onClick={onClick}
     >
