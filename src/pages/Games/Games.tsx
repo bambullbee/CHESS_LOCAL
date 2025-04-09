@@ -48,7 +48,7 @@ const Games = () => {
       ) : (
         <div className={styles.empty}>
           Начатых партий нет.{" "}
-          <Link className={styles.link} to="/newgame">
+          <Link className={styles.link} to="/">
             Начать новую игру
           </Link>
         </div>
