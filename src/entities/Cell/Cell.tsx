@@ -122,13 +122,13 @@ const Cell = ({ row, column, id, colour, figure, isWithoutLogic }: CellP) => {
     const getColors = (color: FigureColor): figureIconColors => {
       if (color === "white") {
         return {
-          firstColor: "#000000",
-          secondColor: "#FFFFFF",
+          firstColor: "#FFFFFF",
+          secondColor: "#000000",
         };
       } else {
         return {
-          firstColor: "#FFFFFF",
-          secondColor: "#000000",
+          firstColor: "#000000",
+          secondColor: "#FFFFFF",
         };
       }
     };

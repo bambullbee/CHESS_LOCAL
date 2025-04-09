@@ -87,8 +87,6 @@ const attackingInfoHandler = (state: initialStateI, payload: number) => {
         state.cells[attackedId].attacked.whoIsFieldUnderAttackBy.directly.push(
           payload
         );
-      } else {
-        //тут можно доделать для пешек, чтобы отображалось только то, куда они действительно могут пойти
       }
     });
     if (range.length > 0) {

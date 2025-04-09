@@ -56,74 +56,76 @@ const CurrentGame = () => {
 
   const { turn, winCondition, winner } = useSelectorTs(selector);
 
-  //IIFE использовано
+  //IIFE использовано для замыкания
   useEffect(
     (() => {
       let isMetWithStartTimer = false;
       return () => {
         let intervalId: ReturnType<typeof setInterval>;
         let wasBonusUsed: boolean = false;
-        if (turn === null) {
-        } else {
-          intervalId = setInterval(() => {
-            const games = JSON.parse(
-              localStorage.getItem("games")
-            ) as unknown as gamesI;
-            const currentGame = games[id];
-            const timer = currentGame.timerInfo.timer;
-            let seconds = parseInt(timer[turn][1]);
-            let minutes = parseInt(timer[turn][0]);
-            if (seconds === 0 && minutes === 0) {
-              dispatch(changeTurn({ color: null, gameId: parseInt(id) }));
-              clearInterval(intervalId);
-              return;
-            }
-            if (
-              timer[turn][0] === currentGame.timerInfo.startMinutes &&
-              !isMetWithStartTimer
-            ) {
+        const intervalFn = () => {
+          const games = JSON.parse(
+            localStorage.getItem("games")
+          ) as unknown as gamesI;
+          const currentGame = games[id];
+          const timer = currentGame.timerInfo.timer;
+          let seconds = parseInt(timer[turn][1]);
+          let minutes = parseInt(timer[turn][0]);
+          if (seconds === 0 && minutes === 0) {
+            dispatch(changeTurn({ color: null, gameId: parseInt(id) }));
+            clearInterval(intervalId);
+            return;
+          }
+          if (
+            timer[turn][0] === currentGame.timerInfo.startMinutes &&
+            !isMetWithStartTimer
+          ) {
+            wasBonusUsed = true;
+            isMetWithStartTimer = true;
+          } else {
+            if (!wasBonusUsed) {
+              seconds += Number(bonus);
               wasBonusUsed = true;
-              isMetWithStartTimer = true;
-            } else {
-              if (!wasBonusUsed) {
-                seconds += Number(bonus);
-                wasBonusUsed = true;
-                if (seconds >= 60) {
-                  minutes += 1;
-                  seconds = seconds - 60;
-                }
+              if (seconds >= 60) {
+                minutes += 1;
+                seconds = seconds - 60;
               }
             }
-            if (seconds === 0) {
-              minutes -= 1;
-              seconds = 59;
-            } else {
-              seconds -= 1;
-            }
-            const newTime = [
-              minutes.toString(),
-              seconds.toString().length === 1
-                ? "0" + seconds.toString()
-                : seconds.toString(),
-            ];
-            localStorage.setItem(
-              "games",
-              JSON.stringify({
-                ...games,
-                [id]: {
-                  ...currentGame,
-                  timerInfo: {
-                    ...currentGame.timerInfo,
-                    timer: { ...timer, [turn]: newTime },
-                  },
+          }
+          if (seconds === 0) {
+            minutes -= 1;
+            seconds = 59;
+          } else {
+            seconds -= 1;
+          }
+          const newTime = [
+            minutes.toString(),
+            seconds.toString().length === 1
+              ? "0" + seconds.toString()
+              : seconds.toString(),
+          ];
+          localStorage.setItem(
+            "games",
+            JSON.stringify({
+              ...games,
+              [id]: {
+                ...currentGame,
+                timerInfo: {
+                  ...currentGame.timerInfo,
+                  timer: { ...timer, [turn]: newTime },
                 },
-              })
-            );
-            if (newTime[1].length === 1) {
-              newTime[1] = "0" + newTime[1];
-            }
-            setGameTimer((prev) => ({ ...prev, [turn]: newTime.join(":") }));
-          }, 1000);
+              },
+            })
+          );
+          if (newTime[1].length === 1) {
+            newTime[1] = "0" + newTime[1];
+          }
+          setGameTimer((prev) => ({ ...prev, [turn]: newTime.join(":") }));
+        };
+        if (turn === null) {
+        } else {
+          intervalFn();
+          intervalId = setInterval(intervalFn, 1000);
         }
         return () => {
           clearInterval(intervalId);
