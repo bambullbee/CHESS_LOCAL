@@ -7,31 +7,30 @@
   overflow: hidden;
 
   display: flex;
-  height: 160px;
   width: auto;
   margin: 0 auto;
 
-  border: 3px solid black;
-  border-radius: 10px;
+  color: var(--whiskey);
+
+  border: 3px solid var(--whiskey);
+  background-color: var(--oil);
+  box-sizing: border-box;
 }
 
 .board {
-  width: 160px;
-  height: 160px;
+  width: 200px;
+  height: 200px;
 }
 
 .info {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
 
-  color: black;
   font-size: 20px;
 
   box-sizing: border-box;
-  background-color: #fff;
-  border: 3px solid black;
+  border: 3px solid var(--whiskey);
   border-top: none;
   border-bottom: none;
 }
@@ -39,8 +38,10 @@
 .info div {
   width: 370px;
   padding: 10px;
+  height: 40px;
 
-  border-bottom: 1px solid black;
+  border-bottom: 3px solid var(--whiskey);
+  box-sizing: border-box;
 }
 
 .info div:last-child {
@@ -56,31 +57,61 @@
 .button {
   display: block;
 
+  color: var(--whiskey);
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .button {
   flex-grow: 1;
 
-  background-color: #0ca1fd;
+  background-color: var(--oil);
 }
 
 .linkWrapper {
   display: flex;
   flex-grow: 1;
 
-  background-color: rgb(188, 125, 255);
-  border-bottom: 3px solid black;
+  background-color: var(--night-rider);
+  border-bottom: 3px solid var(--whiskey);
 }
 
 .button,
 .linkWrapper {
   padding: 5px;
-
-  color: white;
 }
 
 .link {
   margin: auto;
+}
+
+@media screen and (max-width: 780px) {
+  .container {
+    flex-direction: column;
+    width: 300px;
+
+    box-sizing: content-box;
+  }
+
+  .board {
+    height: 300px;
+    width: 300px;
+  }
+
+  .info {
+    border: none;
+  }
+
+  .info div {
+    height: auto;
+    width: 300px;
+  }
+
+  .info div:last-child {
+    border-bottom: 3px solid var(--whiskey);
+  }
+
+  .info div:first-child {
+    border-top: 3px solid var(--whiskey);
+  }
 }

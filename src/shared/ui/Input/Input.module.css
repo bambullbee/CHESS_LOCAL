@@ -3,13 +3,13 @@
   padding-bottom: 20px;
 
   font-size: 30px;
-
-  border-bottom: 3px solid black;
 }
 
 .label {
   display: block;
   width: 100%;
+
+  color: var(--whiskey);
   text-align: center;
 }
 
@@ -19,15 +19,14 @@
   height: 30px;
   margin-top: 10px;
 
-  color: white;
+  color: var(--whiskey);
   font-size: 20px;
   text-align: center;
 
   box-sizing: border-box;
-  border: none;
-  border-radius: 5px;
+  border: 2px solid var(--whiskey);
   outline: none;
-  background-color: rgb(49, 49, 255);
+  background-color: var(--oil);
 }
 
 .errorblock {

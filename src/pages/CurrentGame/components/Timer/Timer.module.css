@@ -1,0 +1,43 @@
+.container {
+  background-color: var(--night-rider);
+  border-bottom: 3px solid var(--whiskey);
+}
+
+.container:last-child {
+  border-bottom: none;
+}
+
+.active {
+  background-color: black;
+}
+
+.name {
+  padding: 5px;
+
+  font-size: 20px;
+
+  border-bottom: 3px solid var(--whiskey);
+}
+
+.time {
+  padding: 5px;
+}
+
+@media screen and (max-width: 780px) {
+  .container {
+    width: 50%;
+  }
+
+  .container:first-child {
+    border-right: 3px solid var(--whiskey);
+  }
+
+  .container:last-child {
+    border-bottom: 3px solid var(--whiskey);
+  }
+
+  .name {
+    overflow: auto;
+    height: 85px;
+  }
+}

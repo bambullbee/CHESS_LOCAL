@@ -42,9 +42,9 @@ const Games = () => {
     return gamesArray;
   }, [localStorageGames]);
   return (
-    <div>
+    <div className={styles.container}>
       {games.length > 0 ? (
-        games
+        <div className={styles.gameContainer}>{games}</div>
       ) : (
         <div className={styles.empty}>
           Начатых партий нет.{" "}

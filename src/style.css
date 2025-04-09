@@ -17,9 +17,7 @@ input[type="number"]:focus {
 }
 
 body {
-  overflow-y: scroll;
-
-  background-color: var(--dodger-blue);
+  background-color: rgb(88, 70, 49);
 }
 
 button,

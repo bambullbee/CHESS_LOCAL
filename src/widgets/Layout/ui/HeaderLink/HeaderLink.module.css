@@ -1,16 +1,28 @@
 .link {
   overflow: hidden;
 
+  position: relative;
+  z-index: 1;
+
   padding: 5px;
 
   border-radius: 10px;
+  box-sizing: border-box;
 }
 
 .active {
-  width: 100%;
   height: 100%;
+}
 
-  color: white;
+.active::before {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
 
-  background-color: var(--dodger-blue);
+  width: 100%;
+  height: 3px;
+
+  background-color: var(--whiskey);
+  content: "";
 }

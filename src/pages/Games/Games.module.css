@@ -10,20 +10,27 @@
   padding: 10px;
 
   font-size: 40px;
-  color: black;
+  color: var(--whiskey);
   text-align: center;
 
-  background-color: #fff;
-  border: 3px solid black;
-  border-radius: 10px;
+  background-color: var(--oil);
+  border: 3px solid var(--whiskey);
 }
 
 .link {
   padding: 5px;
 
-  color: #fff;
+  color: var(--whiskey);
 
-  border: 3px solid black;
-  border-radius: 10px;
-  background-color: var(--dodger-blue);
+  border: 3px solid var(--whiskey);
+  background-color: var(--oil);
+}
+
+.container {
+  margin-bottom: 50px;
+}
+
+@media screen and (max-width: 780px) {
+  .gameContainer {
+  }
 }

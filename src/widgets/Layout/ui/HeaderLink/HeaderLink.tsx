@@ -6,15 +6,21 @@ import { Link, useLocation } from "react-router-dom";
 interface linkI {
   path: string;
   title: string;
+  onClick: () => void;
 }
 
-const HeaderLink = ({ path, title }: linkI) => {
+const HeaderLink = ({ path, title, onClick }: linkI) => {
   const location = useLocation().pathname;
   return (
     <li>
       <Link
         className={`${styles.link} ${path === location ? styles.active : ""}`}
         to={path}
+        onClick={() => {
+          if (onClick) {
+            onClick();
+          }
+        }}
       >
         {title}
       </Link>

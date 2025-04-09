@@ -12,6 +12,7 @@ import parseFEN from "./helpers/parseFEN";
 import styles from "./CurrentGame.module.css";
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { changeTurn, resetBoardSlice } from "@/app";
+import Timer from "./components/Timer/Timer";
 
 const CurrentGame = () => {
   const { id } = useParams<{ id: string }>();
@@ -138,10 +139,24 @@ const CurrentGame = () => {
         <Board setup={parseFEN(setup)} />
       </div>
       <div className={styles.info}>
-        <div style={{ color: "white" }}>{gameTimer.white}</div>
-        <div style={{ color: "black" }}>{gameTimer.black}</div>
-        {turn && <div>Ход: {players[turn]}</div>}
-        {winCondition && <div>{`${winCondition}. Победитель: ${winner}`}</div>}
+        <div className={styles.timers}>
+          <Timer
+            name={players.white}
+            time={gameTimer.white}
+            isActive={"white" === turn}
+          />
+          <Timer
+            name={players.black}
+            time={gameTimer.black}
+            isActive={"black" === turn}
+          />
+        </div>
+        <div className={styles.turnOrWin}>
+          {turn && <div>Ход: {players[turn]}</div>}
+          {winCondition && (
+            <div>{`${winCondition}. Победитель: ${winner}`}</div>
+          )}
+        </div>
       </div>
     </div>
   );

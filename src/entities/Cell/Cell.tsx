@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo } from "react";
 
 import s from "./Cell.module.css";
 import useSelectorTs from "@/shared/withTypesHooks/useSelector";
@@ -21,7 +21,6 @@ import {
   getCellNewInfo,
   moveFigure,
 } from "@/app";
-import { current } from "@reduxjs/toolkit";
 import { useParams } from "react-router-dom";
 
 interface CellP {
@@ -34,18 +33,16 @@ interface CellP {
 }
 
 const Cell = ({ row, column, id, colour, figure, isWithoutLogic }: CellP) => {
-  const shouldShowInfo = false;
-  //заменить хардкод цветов на получение цветов из стора-тема
   const squareColor = useMemo(() => {
     if (row % 2 === 0) {
       if (column % 2 === 0) {
-        return "rgb(146, 168, 174)";
-      } else return "rgb(176, 202, 209)";
+        return "#130d0a";
+      } else return "#d3ad79";
     } else {
       if (column % 2 === 0) {
-        return "rgb(176, 202, 209)";
+        return "#d3ad79";
       } else {
-        return "rgb(146, 168, 174)";
+        return "#130d0a";
       }
     }
   }, []);

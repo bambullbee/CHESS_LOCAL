@@ -1,18 +1,54 @@
 .container {
   display: flex;
+  gap: 50px;
+  margin: 0 auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  max-width: calc(65vmin + 250px);
+
+  color: var(--whiskey);
 }
 
 .board {
-  width: 60vmin;
-  height: 60vmin;
+  width: 65vmin;
+  height: 65vmin;
+
+  border: 30px solid var(--oil);
+  box-sizing: border-box;
 }
 
 .info {
   align-self: stretch;
   width: 200px;
 
-  color: white;
   font-size: 30px;
 
-  background-color: blue;
+  background-color: var(--oil);
+  border: 3px solid var(--whiskey);
+}
+
+.turnOrWin {
+  padding: 5px;
+}
+
+@media screen and (max-width: 780px) {
+  .container {
+    flex-direction: column;
+    width: 90%;
+  }
+
+  .board {
+    width: 90vw;
+    height: 90vw;
+
+    border: 10px solid var(--oil);
+  }
+
+  .info {
+    width: auto;
+  }
+
+  .timers {
+    display: flex;
+  }
 }

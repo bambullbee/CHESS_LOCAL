@@ -1,7 +1,7 @@
 .wrapper {
   display: flex;
-  min-height: 100vh;
   min-width: 100%;
+  margin-top: 50px;
 }
 
 .container {
@@ -30,15 +30,15 @@
   width: 90%;
   padding: 10px;
 
-  color: white;
-  font-size: 30px;
+  color: var(--whiskey);
+  font-size: 25px;
+  letter-spacing: 2px;
   font-weight: 700;
   text-align: center;
 
-  background-color: var(--dodger-blue);
+  background-color: var(--oil);
   opacity: 0;
-  border: 3px solid black;
-  border-radius: 10px;
+  border: 3px solid var(--whiskey);
 }
 
 .link {
@@ -46,15 +46,16 @@
   padding: 10px;
   margin: 10px;
 
-  color: black;
+  color: var(--whiskey);
 
-  background-color: #fff;
-  border: 3px solid black;
-  border-radius: 10px;
+  animation: colorChange 3s infinite;
+  background-color: var(--oil);
+  border: 3px solid var(--whiskey);
 }
 
 .activeWarning {
   display: block;
+
   animation: opacityChange 0.2s forwards;
 }
 
@@ -64,5 +65,15 @@
   }
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes colorChange {
+  0%,
+  100% {
+    border-color: var(--whiskey);
+  }
+  50% {
+    border-color: rgb(107, 19, 19);
   }
 }

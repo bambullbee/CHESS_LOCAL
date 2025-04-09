@@ -5,7 +5,12 @@
   width: 325px;
   padding: 20px;
 
-  background-color: white;
-  border: 3px solid black;
-  border-radius: 10px;
+  background-color: var(--night-rider);
+  border: 3px solid var(--whiskey);
+}
+
+@media screen and (max-width: 780px) {
+  .form {
+    box-sizing: border-box;
+  }
 }
