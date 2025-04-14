@@ -1,11 +1,10 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { Form } from "@/widgets/Form";
-import { gameSettingsI, gamesI, Input, isValidFEN } from "@/shared";
+import { gamesI, Input, isValidFEN, useDispatchTs } from "@/shared";
 
 import styles from "./NewGame.module.css";
-import { Link } from "react-router-dom";
+import { changePage, chooseGame } from "@/app";
 
 const getUniqueIdForLS = (id?: number): number => {
   if (!id) {
@@ -26,7 +25,7 @@ const NewGame = () => {
   }>({});
   const [isWarning, setIsWarning] = useState<boolean>(false);
 
-  const navigate = useNavigate();
+  const dispatch = useDispatchTs();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -109,7 +108,8 @@ const NewGame = () => {
             [uniqueId.toString()]: currentGame,
           } as gamesI)
         );
-        navigate(`/games/${uniqueId}`);
+        dispatch(chooseGame(uniqueId.toString()));
+        dispatch(changePage("game"));
       }
     }
   };
@@ -180,9 +180,14 @@ const NewGame = () => {
           Количество активных игр не может быть больше четырех. Вы можете
           продолжить играть в уже активные или удалить некоторые во вкладке
           "Партии"
-          <Link className={styles.link} to="/games">
+          <button
+            className={styles.link}
+            onClick={() => {
+              dispatch(changePage("games"));
+            }}
+          >
             Перейти
-          </Link>
+          </button>
         </div>
       </div>
     </div>

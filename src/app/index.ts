@@ -13,6 +13,11 @@ import { store } from "./store";
 
 import type { RootState } from "./store";
 
+import {
+  changePage,
+  chooseGame,
+} from "./slices/navigationSlice/navigationSlice";
+
 export {
   App,
   store,
@@ -24,5 +29,7 @@ export {
   defineNotTouchedCells,
   definePawnStep,
   resetBoardSlice,
+  changePage,
+  chooseGame,
   type RootState,
 };

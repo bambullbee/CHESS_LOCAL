@@ -107,13 +107,6 @@ const boardSlice = createSlice({
       cellInfoHandler(state, id, selfCreate);
     },
     getAttackingInfo: (state, { payload }: PayloadAction<number>) => {
-      // if (state.cells[payload].figure === "king") {
-      //   setTimeout(() => {
-      //     attackingInfoHandler(state, payload);
-      //   }, 0);
-      // } else {
-      //   attackingInfoHandler(state, payload);
-      // }
       attackingInfoHandler(state, payload);
     },
     moveFigure: (

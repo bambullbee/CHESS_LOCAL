@@ -21,7 +21,6 @@ import {
   getCellNewInfo,
   moveFigure,
 } from "@/app";
-import { useParams } from "react-router-dom";
 
 interface CellP {
   row: number;
@@ -105,7 +104,7 @@ const Cell = ({ row, column, id, colour, figure, isWithoutLogic }: CellP) => {
     }
   }, []);
 
-  const { id: gameID } = useParams<{ id: string }>();
+  const gameID = useSelectorTs((state) => state.navigation.gameId);
 
   const onClick = () => {
     if (!isWithoutLogic) {

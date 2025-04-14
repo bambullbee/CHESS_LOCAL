@@ -50,6 +50,8 @@ import useLocalStorage from "./hooks/useLocalStorage";
 
 import shouldApplyInitialValueTypeCreator from "./utils/shouldApplyInitialValueTypeCreator";
 
+import { pagesT } from "./types/navigationTypes";
+
 export {
   Pawn,
   Rook,
@@ -91,4 +93,5 @@ export type {
   leaderboardI,
   timerI,
   winConditionT,
+  pagesT,
 };

@@ -1,5 +1,3 @@
-import { useParams } from "react-router-dom";
-
 import {
   createSelectorTs,
   gameSettingsI,
@@ -15,7 +13,7 @@ import { changeTurn, resetBoardSlice } from "@/app";
 import Timer from "./components/Timer/Timer";
 
 const CurrentGame = () => {
-  const { id } = useParams<{ id: string }>();
+  const id = useSelectorTs((state) => state.navigation.gameId);
   const dispatch = useDispatchTs();
 
   const {

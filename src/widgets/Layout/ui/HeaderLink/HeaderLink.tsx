@@ -1,7 +1,6 @@
-import React from "react";
-
+import { pagesT, useDispatchTs, useSelectorTs } from "@/shared";
 import styles from "./HeaderLink.module.css";
-import { Link, useLocation } from "react-router-dom";
+import { changePage } from "@/app";
 
 interface linkI {
   path: string;
@@ -10,20 +9,23 @@ interface linkI {
 }
 
 const HeaderLink = ({ path, title, onClick }: linkI) => {
-  const location = useLocation().pathname;
+  const location = useSelectorTs((state) => state.navigation.page);
+
+  const dispatch = useDispatchTs();
+
   return (
     <li>
-      <Link
+      <button
         className={`${styles.link} ${path === location ? styles.active : ""}`}
-        to={path}
         onClick={() => {
           if (onClick) {
+            dispatch(changePage(path as pagesT));
             onClick();
           }
         }}
       >
         {title}
-      </Link>
+      </button>
     </li>
   );
 };

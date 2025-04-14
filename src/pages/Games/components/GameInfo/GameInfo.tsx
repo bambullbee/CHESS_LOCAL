@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
 import styles from "./GameInfo.module.css";
 import { Board } from "@/widgets/Board";
 import parseFEN from "@/pages/CurrentGame/helpers/parseFEN";
-import { gamesI, timerI } from "@/shared";
+import { gamesI, timerI, useDispatchTs } from "@/shared";
+import { changePage, chooseGame } from "@/app";
 
 interface gameInfoI {
   white: string;
@@ -23,6 +23,8 @@ const GameInfo = ({
   setup,
   updateStorage,
 }: gameInfoI) => {
+  const dispatch = useDispatchTs();
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
@@ -47,9 +49,15 @@ const GameInfo = ({
           <div>Бонусное время: {bonus}</div>
         </div>
         <div className={styles.actions}>
-          <Link className={styles.linkWrapper} to={`/games/${gameId}`}>
+          <button
+            className={styles.linkWrapper}
+            onClick={() => {
+              dispatch(chooseGame(gameId));
+              dispatch(changePage("game"));
+            }}
+          >
             <div className={styles.link}>Перейти к игре</div>
-          </Link>
+          </button>
           <button
             className={styles.button}
             type="button"

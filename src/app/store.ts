@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import boardReducer from "./slices/boardSlice/boardSlice";
+import navigationReducer from "./slices/navigationSlice/navigationSlice";
 
 export const store = configureStore({
   reducer: {
     board: boardReducer,
+    navigation: navigationReducer,
   },
 });
 

@@ -4,12 +4,13 @@ import {
   gameSettingsI,
   gamesI,
   shouldApplyInitialValueTypeCreator,
+  useDispatchTs,
 } from "@/shared";
 import { useLocalStorage } from "@/shared";
 import GameInfo from "./components/GameInfo/GameInfo";
 
 import styles from "./Games.module.css";
-import { Link } from "react-router-dom";
+import { changePage } from "@/app";
 
 const Games = () => {
   const [localStorageGames, updateStorage] = useLocalStorage<gamesI>(
@@ -17,6 +18,9 @@ const Games = () => {
     {},
     shouldApplyInitialValueTypeCreator<gamesI>()
   );
+
+  const dispatch = useDispatchTs();
+
   const games = useMemo(() => {
     const gamesArray: ReactNode[] = [];
     for (let gameId in localStorageGames) {
@@ -48,9 +52,14 @@ const Games = () => {
       ) : (
         <div className={styles.empty}>
           Начатых партий нет.{" "}
-          <Link className={styles.link} to="/">
+          <button
+            className={styles.link}
+            onClick={() => {
+              dispatch(changePage("newgame"));
+            }}
+          >
             Начать новую игру
-          </Link>
+          </button>
         </div>
       )}
     </div>

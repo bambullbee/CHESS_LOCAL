@@ -1,10 +1,11 @@
-import { Link, useLocation } from "react-router-dom";
-import { Outlet } from "react-router-dom";
-
 import styles from "./Layout.module.css";
-import HeaderLink from "./ui/HeaderLink/HeaderLink";
 import Navigation from "./Navigation/Navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSelectorTs } from "@/shared";
+import { NewGame } from "@/pages/NewGame";
+import { Games } from "@/pages/Games";
+import { CurrentGame } from "@/pages/CurrentGame";
+import { Leaderboard } from "@/pages/Leaderboard";
 
 const Layout = () => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
@@ -41,6 +42,22 @@ const Layout = () => {
     };
   }, [isMenuOpened]);
 
+  const page = useSelectorTs((state) => state.navigation.page);
+  const pageComponent = useMemo(() => {
+    if (page === "newgame") {
+      return <NewGame />;
+    }
+    if (page === "games") {
+      return <Games />;
+    }
+    if (page === "game") {
+      return <CurrentGame />;
+    }
+    if (page === "leaderboard") {
+      return <Leaderboard />;
+    }
+  }, [page]);
+
   return (
     <div className={styles.container}>
       <div className={isMenuOpened ? styles.headerOpened : ""}>
@@ -68,9 +85,7 @@ const Layout = () => {
           </div>
         </header>
       </div>
-      <div className={styles.content}>
-        <Outlet />
-      </div>
+      <div className={styles.content}>{pageComponent}</div>
     </div>
   );
 };
